@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="view.ClientGUI">
+  <grid id="27dc6" binding="pnlMain" layout-manager="GridLayoutManager" row-count="6" column-count="7" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="1" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="1243" height="459"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="2ed15" class="javax.swing.JComboBox" binding="cmbRackName">
+        <constraints>
+          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="1" use-parent-layout="false">
+            <minimum-size width="200" height="30"/>
+            <preferred-size width="169" height="30"/>
+            <maximum-size width="200" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <alignmentX value="1.0"/>
+          <font size="20"/>
+          <name value="cmbRackName"/>
+        </properties>
+      </component>
+      <component id="acdc0" class="javax.swing.JButton" binding="btnLoad">
+        <constraints>
+          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="160" height="40"/>
+            <preferred-size width="160" height="40"/>
+            <maximum-size width="160" height="40"/>
+          </grid>
+        </constraints>
+        <properties>
+          <name value="btnLoad"/>
+          <text value="Поставить"/>
+        </properties>
+      </component>
+      <component id="d32e" class="javax.swing.JButton" binding="btnPickUp">
+        <constraints>
+          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="160" height="40"/>
+            <preferred-size width="160" height="40"/>
+            <maximum-size width="160" height="40"/>
+          </grid>
+        </constraints>
+        <properties>
+          <name value="btnPickUp"/>
+          <text value="Снять"/>
+        </properties>
+      </component>
+      <component id="e20e3" class="javax.swing.JComboBox" binding="cmbReference">
+        <constraints>
+          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="200" height="30"/>
+            <preferred-size width="200" height="30"/>
+            <maximum-size width="200" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <font size="20"/>
+          <name value="cmbReference"/>
+        </properties>
+      </component>
+      <component id="6fbff" class="javax.swing.JTextArea" binding="txtCellInfo">
+        <constraints>
+          <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="1" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="200" height="50"/>
+            <preferred-size width="200" height="50"/>
+            <maximum-size width="200" height="50"/>
+          </grid>
+        </constraints>
+        <properties>
+          <font size="14"/>
+          <name value="txtCellInfo"/>
+          <wrapStyleWord value="true"/>
+        </properties>
+      </component>
+      <component id="f7f71" class="javax.swing.JRadioButton" binding="rbSelectDate">
+        <constraints>
+          <grid row="5" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="226" height="19"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="Выбор даты"/>
+        </properties>
+      </component>
+      <component id="3b2c0" class="javax.swing.JLabel" binding="lblTableName">
+        <constraints>
+          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="26" style="1"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="f7f87" class="javax.swing.JLabel" binding="lblSelectedCell">
+        <constraints>
+          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="40" height="20"/>
+            <preferred-size width="40" height="20"/>
+            <maximum-size width="40" height="20"/>
+          </grid>
+        </constraints>
+        <properties>
+          <name value="lblSelectedCell"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <scrollpane id="75f9a" binding="scrollPane">
+        <constraints>
+          <grid row="0" column="0" row-span="5" col-span="5" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="31e47" class="javax.swing.JTable" binding="mainTable">
+            <constraints/>
+            <properties>
+              <name value="mainTable"/>
+            </properties>
+          </component>
+        </children>
+      </scrollpane>
+      <component id="8d8e3" class="javax.swing.JLabel" binding="lblCurrentUser">
+        <constraints>
+          <grid row="5" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <grid id="b1dcf" binding="pnlLogisticDriver" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="5" bottom="0" right="5"/>
+        <constraints>
+          <grid row="4" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="100"/>
+            <preferred-size width="-1" height="100"/>
+            <maximum-size width="-1" height="100"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="bevel-lowered"/>
+        <children>
+          <component id="df8fd" class="javax.swing.JRadioButton" binding="rbShowRef">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Показать"/>
+            </properties>
+          </component>
+          <component id="a7b55" class="javax.swing.JRadioButton" binding="rbAvailableCells">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Доступные ячейки"/>
+            </properties>
+          </component>
+          <vspacer id="20f36">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                <minimum-size width="-1" height="10"/>
+                <preferred-size width="-1" height="10"/>
+                <maximum-size width="-1" height="10"/>
+              </grid>
+            </constraints>
+          </vspacer>
+        </children>
+      </grid>
+      <grid id="b9a39" binding="pnlStoreKeeper" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="3" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="line" title="Функции Кладовщика">
+          <color color="-4473925"/>
+        </border>
+        <children>
+          <component id="59b0b" class="javax.swing.JButton" binding="btnForcePickUp">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                <minimum-size width="180" height="30"/>
+                <preferred-size width="180" height="30"/>
+                <maximum-size width="180" height="30"/>
+              </grid>
+            </constraints>
+            <properties>
+              <text value="Снять принудительно"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="e3b56" binding="pnlManager" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="2" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="line" title="Меню менеджера">
+          <color color="-4473925"/>
+        </border>
+        <children>
+          <component id="84c15" class="javax.swing.JComboBox" binding="cmbManagerFunctions">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="184" height="30"/>
+              </grid>
+            </constraints>
+            <properties/>
+          </component>
+          <component id="5fbbf" class="javax.swing.JButton" binding="btnRunManagerCommand">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                <minimum-size width="50" height="30"/>
+                <preferred-size width="50" height="30"/>
+                <maximum-size width="50" height="30"/>
+              </grid>
+            </constraints>
+            <properties>
+              <text value="ОК"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
