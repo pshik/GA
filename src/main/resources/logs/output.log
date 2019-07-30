@@ -916,3 +916,11 @@
 2019-07-30 10:55:33,588 SECURITY  [Thread-5] - User dmitriy.suslennikov login
 2019-07-30 10:55:52,779 SECURITY  [Thread-6] - User alexander.bush login
 2019-07-30 10:57:53,185 SECURITY  [Thread-7] - User dmitriy.suslennikov login
+2019-07-30 11:02:03,238 DEBUG  [main] - Server is running!
+2019-07-30 11:02:12,081 SECURITY  [Thread-2] - User dmitriy.suslennikov login
+2019-07-30 11:04:51,112 SECURITY  [Thread-3] - User dmitriy.suslennikov login
+2019-07-30 11:20:21,487 SECURITY  [Thread-4] - User dmitriy.suslennikov login
+2019-07-30 11:21:28,485 SECURITY  [Thread-5] - User dmitriy.suslennikov login
+2019-07-30 11:25:08,864 SECURITY  [Thread-6] - User dmitriy.suslennikov login
+2019-07-30 11:35:53,864 SECURITY  [Thread-7] - User dmitriy.suslennikov login
+2019-07-30 11:39:58,167 SECURITY  [Thread-8] - User dmitriy.suslennikov login

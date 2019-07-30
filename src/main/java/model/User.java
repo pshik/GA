@@ -1,11 +1,12 @@
 package model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
 @JsonAutoDetect
-public class User implements Serializable {
+public class User implements Serializable,Comparable<User> {
     private String login;
     private String firstName;
     private String secondName;
@@ -59,5 +60,10 @@ public class User implements Serializable {
                 ", role='" + role + '\'' +
                 ", password='" + password + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(@NotNull User o) {
+        return login.compareTo(o.login);
     }
 }

@@ -1,8 +1,13 @@
 package view;
 
-import javax.swing.*;
+import controller.ClientGuiController;
+import model.User;
 
-public class UsersSettings {
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Collections;
+
+public class UsersSettings extends JFrame{
     private JComboBox comboBox1;
     private JLabel lblLogin;
     private JLabel lblFirstName;
@@ -18,4 +23,25 @@ public class UsersSettings {
     private JButton btnCreate;
     private JButton btnDelete;
     private JComboBox cmbRoles;
+    private JPanel pnlUsers;
+
+    public UsersSettings() {
+        setTitle("Настройка пользователей");
+        setVisible(false);
+        setUndecorated(true);
+        getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+        setLocation(200,200);
+        // setAlwaysOnTop(true);
+        setContentPane(pnlUsers);
+    }
+
+    public void initView(ClientGuiController controller, ArrayList<User> users){
+        if (controller != null)
+        {
+            controller.setBusy(true);
+        }
+        Collections.sort(users);
+
+
+    }
 }
