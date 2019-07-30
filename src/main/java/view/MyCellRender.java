@@ -5,7 +5,7 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 
-public class MyCellRender extends JPanel implements TableCellRenderer {
+class MyCellRender extends JPanel implements TableCellRenderer {
     private JButton button1= new JButton();
     private JButton button2= new JButton();
     private JButton button3= new JButton();

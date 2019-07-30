@@ -12,7 +12,7 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class RowNumberTable extends JTable
+class RowNumberTable extends JTable
         implements ChangeListener, PropertyChangeListener, TableModelListener
 {
     private JTable main;
@@ -148,7 +148,7 @@ public class RowNumberTable extends JTable
      */
     private static class RowNumberRenderer extends DefaultTableCellRenderer
     {
-        public RowNumberRenderer()
+        RowNumberRenderer()
         {
             setHorizontalAlignment(JLabel.CENTER);
         }

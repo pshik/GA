@@ -63,7 +63,7 @@ public class Server {
     private static class Handler extends Thread{
         private Socket socket;
 
-        public Handler(Socket socket){
+        Handler(Socket socket){
             this.socket = socket;
         }
 
@@ -215,8 +215,7 @@ public class Server {
         private String messageData(ConcurrentMap map) throws IOException {
             ArrayList<Object> list = new ArrayList<>();
             for (Object o : map.values()) {
-                Object u =  o;
-                list.add(u);
+                list.add(o);
             }
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ObjectMapper mapper = new ObjectMapper();

@@ -13,7 +13,7 @@ import java.util.Locale;
 public class Test extends JFrame {
         private static List<JLabel> labels = new ArrayList<JLabel>();
 
-        public static void createGUI() {
+        private static void createGUI() {
             JFrame frame = new JFrame("Test frame");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

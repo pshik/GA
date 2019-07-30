@@ -91,19 +91,19 @@ public class Logon extends JFrame{
         return false;
     }
 
-    public JButton getBtnEnter() {
+    private JButton getBtnEnter() {
         return btnEnter;
     }
 
-    public JComboBox getCmbLogin() {
+    private JComboBox getCmbLogin() {
         return cmbLogin;
     }
 
-    public JLabel getLblStatus() {
+    private JLabel getLblStatus() {
         return lblStatus;
     }
 
-    public JPasswordField getTxtPassword() {
+    private JPasswordField getTxtPassword() {
         return txtPassword;
     }
 

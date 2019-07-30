@@ -591,7 +591,7 @@ public class MonopolyMode extends JFrame{
         return result;
     }
 
-    public void loadHistory() {
+    private void loadHistory() {
         txtaHistory.setText("");
         ArrayList<Event> events = LogParser.getInstance().getEvents();
         for (Event e: events){

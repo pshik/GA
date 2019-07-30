@@ -3,7 +3,7 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 
-public class ViewCellHelper {
+class ViewCellHelper {
     private static final int TEXT_SIZE = 7;
     private static final int HEIGHT = 30;
     private static int WIDTH_1;

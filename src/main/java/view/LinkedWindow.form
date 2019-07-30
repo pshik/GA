@@ -82,7 +82,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Обновить"/>
+          <text resource-bundle="strings" key="btn_Update"/>
         </properties>
       </component>
       <hspacer id="2fc51">
@@ -101,7 +101,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Закрыть"/>
+          <text resource-bundle="strings" key="btn_Cancel"/>
         </properties>
       </component>
       <hspacer id="cd578">

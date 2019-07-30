@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MyCellEditor extends DefaultCellEditor {
+class MyCellEditor extends DefaultCellEditor {
     private JButton button1= new JButton();
     private JButton button2= new JButton();
     private JButton button3= new JButton();

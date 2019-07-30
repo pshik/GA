@@ -17,7 +17,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Выберите пользователя"/>
+          <text resource-bundle="strings" key="txt_SelectUser"/>
         </properties>
       </component>
       <component id="97ccc" class="javax.swing.JComboBox" binding="cmbLogin">
@@ -45,7 +45,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Enter"/>
+          <text resource-bundle="strings" key="btn_Enter"/>
         </properties>
       </component>
       <component id="f6943" class="javax.swing.JLabel">
@@ -57,7 +57,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Введите пароль"/>
+          <text resource-bundle="strings" key="txt_EnterPassword"/>
         </properties>
       </component>
       <component id="b4e19" class="javax.swing.JLabel" binding="lblStatus">

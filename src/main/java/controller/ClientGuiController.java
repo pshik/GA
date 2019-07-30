@@ -25,7 +25,7 @@ public class ClientGuiController {
     private static String serverAddress;
 
     private static TreeMap<Integer,String> listOfManagersCommands = new TreeMap<>();
-    protected Connection connection;
+    private Connection connection;
     private volatile boolean clientConnected = false;
     private String CurrentUser;
     private ClientGuiModel model = new ClientGuiModel();
@@ -88,7 +88,7 @@ public class ClientGuiController {
         sendMessage(MessageType.LOAD_PALLET,cellFulPath + "-_-" + refName + "-_-" + lblTableName + "-_-" + b);
     }
 
-    public class GuiSocketThread extends Thread{
+    class GuiSocketThread extends Thread{
 
 
         public void run(){
@@ -231,7 +231,7 @@ public class ClientGuiController {
                 ClientGuiController.this.notify();
             }
         }
-        protected void clientStartWorkplace() throws IOException, ClassNotFoundException{
+        void clientStartWorkplace() throws IOException, ClassNotFoundException{
             Message message;
             connection.send(new Message(MessageType.RACK_UPDATE));
             message = connection.receive();
@@ -263,12 +263,12 @@ public class ClientGuiController {
     }
 
 
-    protected Thread getSocketThread() {
+    private Thread getSocketThread() {
         return new GuiSocketThread();
     }
 
 
-    public void run() {
+    private void run() {
         getSocketThread().run();
     }
 
