@@ -26,6 +26,8 @@ public class UsersSettings extends JFrame{
     private JButton btnDelete;
     private JComboBox cmbRoles;
     private JPanel pnlUsers;
+    private JButton btn_Show;
+    private JButton btn_Clear;
 
     public UsersSettings() {
         setTitle("Настройка пользователей");
@@ -39,6 +41,7 @@ public class UsersSettings extends JFrame{
         cmbRoles.addItem("LogisticManager");
         cmbRoles.addItem("StoreKeeper");
         cmbRoles.addItem("Driver");
+
 
     }
 
@@ -56,6 +59,37 @@ public class UsersSettings extends JFrame{
                     controller.getView().refreshRack();
                 }
                 dispose();
+            }
+        });
+        btn_Show.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        btn_Clear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        btnDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        btnCreate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        btnUpdate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
             }
         });
         for (User u: users){
