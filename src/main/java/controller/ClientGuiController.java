@@ -146,12 +146,14 @@ public class ClientGuiController {
                                 if (!isBusy) {
                                     view.refreshRack();
                                 }
-//                        Cell[] c = mapper.readValue(reader, Cell[].class);
-//                        cells.addAll(Arrays.asList(c));
                                 break;
-                            case USERS_LIST:
-//                        User[] u = mapper.readValue(reader, User[].class);
-//                        users.addAll(Arrays.asList(u));
+                            case USERS_UPDATE:
+                                connection.send(new Message(MessageType.USER_REQUEST));
+                                message = connection.receive();
+                                if (message.getType() == MessageType.USERS_UPDATE){
+                                    getBase(message);
+                                    model.updateUsers(users);
+                                }
                                 break;
                             case SERVER_IS_STOPPED:
 
@@ -164,7 +166,7 @@ public class ClientGuiController {
             Message message;
             connection.send(new Message(MessageType.USER_REQUEST));
             message = connection.receive();
-            if ((message.getType() == MessageType.USERS_LIST) && users.isEmpty()) {
+            if ((message.getType() == MessageType.USERS_UPDATE) && users.isEmpty()) {
                 try {
                     getBase(message);
 
@@ -213,7 +215,7 @@ public class ClientGuiController {
                         cells.clear();
                     cells.addAll(Arrays.asList(c));
                     break;
-                case USERS_LIST:
+                case USERS_UPDATE:
                     User[] u = mapper.readValue(reader, User[].class);
                     if(!users.isEmpty())
                         users.clear();

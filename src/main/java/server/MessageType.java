@@ -21,5 +21,6 @@ public enum  MessageType {
     CHANGE_RACK,
     CHANGE_REFERENCE,
     CHANGE_USER,
-    CHANGE_LINK_RACK_TO_REF
+    CHANGE_LINK_RACK_TO_REF,
+    USERS_UPDATE
 }

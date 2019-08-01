@@ -22,8 +22,6 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static server.MessageType.USERS_LIST;
-
 public class Server {
     private static Map<Connection, String> connectionMap = new ConcurrentHashMap<>();
     private static int port;
@@ -83,7 +81,7 @@ public class Server {
 
                 mapper.writeValue(out, userList);
                 String data = out.toString();
-                connection.send(new Message(USERS_LIST, data));
+                connection.send(new Message(MessageType.USERS_UPDATE, data));
                 Message answer = connection.receive();
                 if (answer.getType() == MessageType.ACCESS_GRANTED) {
                     LoggerFiFo.getInstance().getRootLogger().log(Level.forName("SECURITY", 350), "User " + answer.getData() + " login");
@@ -127,6 +125,9 @@ public class Server {
             while (connectionActive){
                 Message m = connection.receive();
                 String data;
+                int action;
+                StringReader reader;
+                ObjectMapper mapper = new ObjectMapper();
                 boolean isCorrect;
                 switch (m.getType()){
                     case RACK_UPDATE:
@@ -138,6 +139,11 @@ public class Server {
                         ConcurrentMap references = base.getBase("References");
                         data = messageData(references);
                         connection.send(new Message(MessageType.REFERENCE_REQUEST, data));
+                        break;
+                    case USER_REQUEST:
+                        ConcurrentMap users = base.getBase("Users");
+                        data = messageData(users);
+                        connection.send(new Message(MessageType.USERS_UPDATE, data));
                         break;
                     case CELL_UPDATE:
                         ConcurrentMap cells = base.getBase("Cells");
@@ -165,7 +171,6 @@ public class Server {
                                 connection.send(new Message(MessageType.SETTINGS,"BLOCKED_DAYS:=" + BLOCKED_DAYS));
                                 break;
                         }
-
                         break;
                     case GOODBYE:
                         System.out.println("Польхователь: " + userName + " закончил работу. Используется соединение с удаленным адресом: " + socket.getRemoteSocketAddress());
@@ -189,9 +194,8 @@ public class Server {
                         break;
                     case CHANGE_REFERENCE:
                         data = m.getData();
-                        int action = Integer.parseInt(data.substring(0,1));
-                        StringReader reader = new StringReader(data.substring(1));
-                        ObjectMapper mapper = new ObjectMapper();
+                        action = Integer.parseInt(data.substring(0,1));
+                        reader = new StringReader(data.substring(1));
                         mapper.registerModule(new JavaTimeModule());
                         SAPReference s = mapper.readValue(reader, SAPReference.class);
                         isCorrect = serverController.changeReference(userName,s,action);
@@ -204,6 +208,17 @@ public class Server {
                         isCorrect = serverController.changeLinkRackToRef(userName,data.split("-_-")[0],data.split("-_-")[1]);
                         if (isCorrect){
                             broadcastMessage(MessageType.REFERENCE_UPDATE);
+                        }
+                        break;
+                    case CHANGE_USER:
+                        data = m.getData();
+                        action = Integer.parseInt(data.substring(0,1));
+                        reader = new StringReader(data.substring(1));
+                        mapper.registerModule(new JavaTimeModule());
+                        User u = mapper.readValue(reader, User.class);
+                        isCorrect = serverController.changeUser(userName,u,action);
+                        if (isCorrect){
+                            broadcastMessage(MessageType.USERS_UPDATE);
                         }
                         break;
                     default:

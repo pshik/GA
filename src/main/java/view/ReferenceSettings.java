@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static server.MessageType.USERS_LIST;
+import static server.MessageType.USERS_UPDATE;
 
 public class ReferenceSettings extends JFrame{
     private JComboBox cmbReferences;

@@ -32,8 +32,6 @@ public class LinkedWindow extends JFrame{
         setLocation(300,200);
        // setAlwaysOnTop(true);
         setContentPane(refPane);
-
-
     }
     public void initView(ClientGuiController controller, ArrayList<Rack> racks, ArrayList<SAPReference> references){
 

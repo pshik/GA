@@ -345,4 +345,29 @@ public class ServerController {
 
         return isCorrect;
     }
+
+    public boolean changeUser(String userName, User data, int action) {
+        boolean isCorrect = false;
+        ConcurrentMap tmp = base.getBase("Users");
+
+        try {
+            switch (action){
+                case 0:
+                    users.remove(data.getLogin());
+                    break;
+                case 1:
+                    if (users.containsKey(data.getLogin())) {
+                        users.replace(data.getLogin(), data);
+                    } else {
+                        users.put(data.getLogin(), data);
+                    }
+                    break;
+            }
+            isCorrect = true;
+        } catch (Exception e) {
+            users = tmp;
+        }
+
+        return isCorrect;
+    }
 }

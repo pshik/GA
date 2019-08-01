@@ -924,3 +924,17 @@
 2019-07-30 11:25:08,864 SECURITY  [Thread-6] - User dmitriy.suslennikov login
 2019-07-30 11:35:53,864 SECURITY  [Thread-7] - User dmitriy.suslennikov login
 2019-07-30 11:39:58,167 SECURITY  [Thread-8] - User dmitriy.suslennikov login
+2019-07-31 15:40:42,389 DEBUG  [main] - Server is running!
+2019-07-31 15:40:55,492 SECURITY  [Thread-2] - User dmitriy.suslennikov login
+2019-07-31 15:42:35,423 SECURITY  [Thread-3] - User dmitriy.suslennikov login
+2019-07-31 16:53:26,279 DEBUG  [main] - Server is running!
+2019-07-31 16:53:35,584 SECURITY  [Thread-2] - User dmitriy.suslennikov login
+2019-08-01 14:47:57,757 DEBUG  [main] - Server is running!
+2019-08-01 14:48:10,799 SECURITY  [Thread-2] - User dmitriy.suslennikov login
+2019-08-01 14:49:17,840 SECURITY  [Thread-3] - User dmitriy.suslennikov login
+2019-08-01 15:11:17,973 SECURITY  [Thread-4] - User dmitriy.suslennikov login
+2019-08-01 15:16:26,417 DEBUG  [main] - Server is running!
+2019-08-01 15:17:15,731 SECURITY  [Thread-2] - User dmitriy.suslennikov login
+2019-08-01 15:19:39,428 SECURITY  [Thread-3] - User dmitriy.suslennikov login
+2019-08-01 15:20:57,940 SECURITY  [Thread-4] - User admin login
+2019-08-01 15:34:29,633 SECURITY  [Thread-5] - User dmitriy.suslennikov login

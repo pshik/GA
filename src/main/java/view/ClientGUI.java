@@ -526,6 +526,10 @@ public class ClientGUI extends JFrame{
                                 for (SAPReference s : controller.getModel().getReferences()){
                                     listOfReferences.add(s);
                                 }
+                                ArrayList<User> listOfUsers = new ArrayList<>();
+                                for (User u : controller.getModel().getUsers()){
+                                    listOfUsers.add(u);
+                                }
                                 switch (k){
                                     //"Создать стеллаж"
                                     case 1:
@@ -553,7 +557,8 @@ public class ClientGUI extends JFrame{
                                         break;
                                     //"Управление пользователями"
                                     case 5:
-
+                                        UsersSettings usersSettings = new UsersSettings();
+                                        usersSettings.initView(controller);
                                        // controller.sendMessage(MessageType.CHANGE_RACK,listOfManagersCommands.get(k)+ controller.MESSAGE_DELIMITER + "removeRack");
                                         break;
                                         //"Удалить пользователя"
