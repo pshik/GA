@@ -565,8 +565,8 @@ public class ClientGUI extends JFrame{
                                         break;
                                     //Привязка стеллажей к материалам
                                     case 9:
-                                        LinkedWindow linkedWindow = new LinkedWindow();
-                                        linkedWindow.initView(controller,listOfRacks,listOfReferences);
+//                                        LinkedWindow linkedWindow = new LinkedWindow();
+//                                        linkedWindow.initView(controller,listOfRacks,listOfReferences);
                                         break;
                                 }
                             }

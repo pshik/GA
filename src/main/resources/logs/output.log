@@ -1022,3 +1022,6 @@
 2019-08-02 16:51:07,563 SECURITY  [Thread-2] - User dmitriy.suslennikov login
 2019-08-02 16:53:13,938 DEBUG  [main] - Server is running!
 2019-08-02 16:53:20,279 SECURITY  [Thread-2] - User dmitriy.suslennikov login
+2019-08-02 19:41:41,206 DEBUG  [main] - Server is running!
+2019-08-02 19:41:51,016 SECURITY  [Thread-2] - User dmitriy.suslennikov login
+2019-08-02 19:43:36,816 SECURITY  [Thread-3] - User dmitriy.suslennikov login
