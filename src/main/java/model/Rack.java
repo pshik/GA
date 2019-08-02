@@ -1,12 +1,13 @@
 package model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @JsonAutoDetect
-public class Rack implements Serializable {
+public class Rack implements Serializable,Comparable<Rack> {
     private String name;
     private int col;
     private int row;
@@ -52,5 +53,10 @@ public class Rack implements Serializable {
     }
 
     public Rack() {
+    }
+
+    @Override
+    public int compareTo(@NotNull Rack o) {
+        return name.compareTo(o.name);
     }
 }

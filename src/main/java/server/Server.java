@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import controller.ServerController;
 import dao.Base;
 import log.LoggerFiFo;
+import model.Rack;
 import model.SAPReference;
 import model.User;
 import org.apache.logging.log4j.Level;
@@ -128,6 +129,7 @@ public class Server {
                 int action;
                 StringReader reader;
                 ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
                 boolean isCorrect;
                 switch (m.getType()){
                     case RACK_UPDATE:
@@ -187,7 +189,11 @@ public class Server {
                         break;
                     case CHANGE_RACK:
                         data = m.getData();
-                        isCorrect = serverController.changeRack(userName,data.split("-_-")[0],data.substring(4));
+                        action = Integer.parseInt(data.substring(0,1));
+                        String refList = data.split("-_-")[1];
+                        reader = new StringReader(data.substring(1).split("-_-")[0]);
+                        Rack r = mapper.readValue(reader,Rack.class);
+                        isCorrect = serverController.changeRack(userName,r,action,refList);
                         if (isCorrect){
                             broadcastMessage(MessageType.RACK_UPDATE);
                         }
@@ -196,7 +202,6 @@ public class Server {
                         data = m.getData();
                         action = Integer.parseInt(data.substring(0,1));
                         reader = new StringReader(data.substring(1));
-                        mapper.registerModule(new JavaTimeModule());
                         SAPReference s = mapper.readValue(reader, SAPReference.class);
                         isCorrect = serverController.changeReference(userName,s,action);
                         if (isCorrect){
@@ -214,7 +219,6 @@ public class Server {
                         data = m.getData();
                         action = Integer.parseInt(data.substring(0,1));
                         reader = new StringReader(data.substring(1));
-                        mapper.registerModule(new JavaTimeModule());
                         User u = mapper.readValue(reader, User.class);
                         isCorrect = serverController.changeUser(userName,u,action);
                         if (isCorrect){

@@ -7,6 +7,7 @@
     </constraints>
     <properties>
       <background color="-3276901"/>
+      <enabled value="true"/>
     </properties>
     <border type="none"/>
     <children>
@@ -70,7 +71,7 @@
         </constraints>
         <properties/>
       </component>
-      <component id="8918c" class="javax.swing.JTextField" binding="txtfNewRef">
+      <component id="8918c" class="javax.swing.JTextField" binding="txtNewRef">
         <constraints>
           <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
@@ -78,7 +79,7 @@
         </constraints>
         <properties/>
       </component>
-      <component id="e4913" class="javax.swing.JTextField" binding="txtfDescription">
+      <component id="e4913" class="javax.swing.JTextField" binding="txtDescription">
         <constraints>
           <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>

@@ -5,7 +5,9 @@
     <constraints>
       <xy x="20" y="20" width="602" height="520"/>
     </constraints>
-    <properties/>
+    <properties>
+      <background color="-3276901"/>
+    </properties>
     <border type="none"/>
     <children>
       <component id="aec8a" class="javax.swing.JComboBox" binding="cmbUsers">

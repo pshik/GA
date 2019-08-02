@@ -191,6 +191,7 @@ public class ClientGUI extends JFrame{
             }
         });
 
+
     }
 
     private void showAvailableCells(String reference, String rackName, int stage) {
@@ -370,7 +371,8 @@ public class ClientGUI extends JFrame{
             cmbManagerFunctions.addItem(s);
         }
         cmbManagerFunctions.setMaximumRowCount(4);
-       // setBounds(20,0,1600,1024);
+
+        // setBounds(20,0,1600,1024);
         WindowListener exitListener = new WindowAdapter() {
 
             @Override
@@ -408,8 +410,7 @@ public class ClientGUI extends JFrame{
         UIManager.put("OptionPane.yesButtonText"   , "Да"    );
         UIManager.put("OptionPane.noButtonText"    , "Нет"   );
         UIManager.put("OptionPane.cancelButtonText", "Отмена");
-        ClientGuiModel model = controller.getModel();
-        Set<User> users = model.getUsers();
+        Set<User> users = controller.getModel().getUsers();
         int itemCount = cmbLogin.getItemCount();
         String[] logins = new String[itemCount];
         for(int i = 0 ; i < itemCount; i++){
@@ -447,6 +448,7 @@ public class ClientGUI extends JFrame{
     }
 
     public void refreshUsers() {
+        cmbLogin.removeAllItems();
         ClientGuiModel model = controller.getModel();
         Set<User> users = model.getUsers();
         for (User o: users){
@@ -533,38 +535,35 @@ public class ClientGUI extends JFrame{
                                 switch (k){
                                     //"Создать стеллаж"
                                     case 1:
-                                        answer1  = JOptionPane.showInputDialog(pnlMain,"Введите название стеллажа: ");
-                                        answer2  = JOptionPane.showInputDialog(pnlMain,"Введите кол-во колонок: ");
-                                        answer3  = JOptionPane.showInputDialog(pnlMain,"Введите кол-во строк: ");
-                                        controller.sendMessage(MessageType.CHANGE_RACK,0 + controller.MESSAGE_DELIMITER + answer1 + controller.MESSAGE_DELIMITER + answer2 + controller.MESSAGE_DELIMITER + answer3);
+//                                        answer1  = JOptionPane.showInputDialog(pnlMain,"Введите название стеллажа: ");
+//                                        answer2  = JOptionPane.showInputDialog(pnlMain,"Введите кол-во колонок: ");
+//                                        answer3  = JOptionPane.showInputDialog(pnlMain,"Введите кол-во строк: ");
+//                                        controller.sendMessage(MessageType.CHANGE_RACK,0 + controller.MESSAGE_DELIMITER + answer1 + controller.MESSAGE_DELIMITER + answer2 + controller.MESSAGE_DELIMITER + answer3);
                                         break;
                                     //"Удалить стеллаж"
                                     case 2:
-                                        answer1  = JOptionPane.showInputDialog(pnlMain,"Введите название стеллажа: ");
-                                        controller.sendMessage(MessageType.CHANGE_RACK,1 + controller.MESSAGE_DELIMITER + answer1);
+//                                        answer1  = JOptionPane.showInputDialog(pnlMain,"Введите название стеллажа: ");
+//                                        controller.sendMessage(MessageType.CHANGE_RACK,1 + controller.MESSAGE_DELIMITER + answer1);
                                         break;
                                     //"Управление материалами"
                                     case 3:
                                         ReferenceSettings referenceSettings = new ReferenceSettings();
                                         referenceSettings.initView(controller,listOfRacks,listOfReferences);
-//                                        answer1  = JOptionPane.showInputDialog(pnlMain,"Введите название материала: ");
-//                                        answer2  = JOptionPane.showInputDialog(pnlMain,"Введите описание: ");
-//                                        answer3  = JOptionPane.showInputDialog(pnlMain,"Введите кол-во строк: ");
-//                                        controller.sendMessage(MessageType.CHANGE_RACK,0 + controller.MESSAGE_DELIMITER + answer1 + controller.MESSAGE_DELIMITER + answer2 + controller.MESSAGE_DELIMITER + answer3);
                                         break;
-                                    //"Удалить материал"
+                                    //"Управление стеллажами"
                                     case 4:
+                                        RackSettings rackSettings = new RackSettings();
+                                        rackSettings.initView(controller);
                                         break;
                                     //"Управление пользователями"
                                     case 5:
                                         UsersSettings usersSettings = new UsersSettings();
                                         usersSettings.initView(controller);
-                                       // controller.sendMessage(MessageType.CHANGE_RACK,listOfManagersCommands.get(k)+ controller.MESSAGE_DELIMITER + "removeRack");
-                                        break;
-                                        //"Удалить пользователя"
+                                         break;
+                                     //"Удалить пользователя"
                                     case 6:
-                                      //  controller.sendMessage(MessageType.CHANGE_RACK,listOfManagersCommands.get(k)+ controller.MESSAGE_DELIMITER + "removeReference");
                                         break;
+                                    //Привязка стеллажей к материалам
                                     case 9:
                                         LinkedWindow linkedWindow = new LinkedWindow();
                                         linkedWindow.initView(controller,listOfRacks,listOfReferences);
@@ -723,7 +722,6 @@ public class ClientGUI extends JFrame{
                 Calendar cal = (Calendar) value;
                 return dateFormatter.format(cal.getTime());
             }
-
             return "";
         }
 

@@ -25,9 +25,10 @@ public class ClientGuiController {
     private static String serverAddress;
 
     private static TreeMap<Integer,String> listOfManagersCommands = new TreeMap<>();
+
     private Connection connection;
     private volatile boolean clientConnected = false;
-    private String CurrentUser;
+    private String currentUser;
     private ClientGuiModel model = new ClientGuiModel();
     private ClientGUI view = new ClientGUI(this);
     private ArrayList<User> users = new ArrayList<>();
@@ -37,10 +38,10 @@ public class ClientGuiController {
     private boolean access = false;
     private boolean isBusy = false;
     static {
-        listOfManagersCommands.put(1,"Создать стеллаж");
-        listOfManagersCommands.put(2,"Удалить стеллаж");
+      //  listOfManagersCommands.put(1,"Создать стеллаж");
+       // listOfManagersCommands.put(2,"Удалить стеллаж");
         listOfManagersCommands.put(3,"Управление материалами");
-       // listOfManagersCommands.put(4,"Удалить материал");
+        listOfManagersCommands.put(4,"Управление стеллажами");
         listOfManagersCommands.put(5,"Управление пользователями");
        // listOfManagersCommands.put(6,"Удалить пользователя");
       //  listOfManagersCommands.put(7,"Выгрузить в ...");
@@ -48,9 +49,11 @@ public class ClientGuiController {
         listOfManagersCommands.put(9,"Привязать материалы к стеллажу");
     }
     public String getCurrentUser() {
-        return CurrentUser;
+        return currentUser;
     }
-
+    public Connection getConnection() {
+        return connection;
+    }
     public TreeMap<Integer, String> getListOfManagersCommands() {
         return listOfManagersCommands;
     }
@@ -88,6 +91,15 @@ public class ClientGuiController {
         sendMessage(MessageType.LOAD_PALLET,cellFulPath + "-_-" + refName + "-_-" + lblTableName + "-_-" + b);
     }
 
+    public void reload() {
+        ClientGuiController.this.run();
+    }
+
+    public void setCurrentUser(String activeUser) {
+        currentUser = activeUser;
+    }
+
+
     class GuiSocketThread extends Thread{
 
 
@@ -104,8 +116,8 @@ public class ClientGuiController {
             } catch (IOException | ClassNotFoundException e) {
                 System.out.println("Server not available!");
                 view.serverStatus();
-                ClientGuiController.this.run();
-            } catch (Exception e) {
+                reload();
+            }  catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -134,7 +146,18 @@ public class ClientGuiController {
                                     getBase(message);
                                     model.updateRack(racks);
                                 }
-                                view.refreshRackList();
+                                if (!isBusy) {
+                                    view.refreshRackList();
+                                }
+                                connection.send(new Message(MessageType.REFERENCE_REQUEST));
+                                message = connection.receive();
+                                if (message.getType() == MessageType.REFERENCE_REQUEST){
+                                    getBase(message);
+                                    model.updateReferences(references);
+                                }
+                                if (!isBusy) {
+                                    view.refreshRack();
+                                }
                                 break;
                             case CELL_UPDATE:
                                 connection.send(new Message(MessageType.CELL_UPDATE));
@@ -183,7 +206,7 @@ public class ClientGuiController {
                         if (!access_granted)
                             continue;
                         String name = view.getActiveUser();
-                        CurrentUser = name;
+                        currentUser = name;
                         connection.send(new Message(MessageType.ACCESS_GRANTED, name));
                     } catch (CloseWindow closeWindow) {
                         System.exit(0);

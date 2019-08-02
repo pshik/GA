@@ -5,7 +5,6 @@ import controller.ClientGuiController;
 import model.User;
 import server.MessageType;
 
-import javax.jws.soap.SOAPBinding;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,7 +35,7 @@ public class UsersSettings extends JFrame{
     private JPasswordField pswdField;
     private JLabel lblPassword;
     private JButton btn_Refresh;
-
+    private ArrayList<User> users = new ArrayList<>();
     public UsersSettings() {
         setTitle("Настройка пользователей");
         setVisible(false);
@@ -59,18 +58,14 @@ public class UsersSettings extends JFrame{
         {
             controller.setBusy(true);
         }
-        ArrayList<User> users = new ArrayList<>();
-        for (User t: controller.getModel().getUsers()){
-            users.add(t);
-        }
+
+        users.addAll(controller.getModel().getUsers());
 
         btnExit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (controller !=null) {
-                    controller.setBusy(false);
-                    controller.getView().refreshRack();
-                }
+                controller.setBusy(false);
+                controller.getView().refreshRack();
                 dispose();
             }
         });
@@ -80,9 +75,7 @@ public class UsersSettings extends JFrame{
                 controller.setBusy(false);
                 clearFields();
                 users.clear();
-                for (User u: controller.getModel().getUsers()){
-                    users.add(u);
-                }
+                users.addAll(controller.getModel().getUsers());
                 addUserToCmb(users);
                 controller.setBusy(true);
             }
@@ -124,8 +117,12 @@ public class UsersSettings extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!txtLogin.getText().equals(controller.getCurrentUser())) {
-                    User tmp = new User(txtLogin.getText(), txtFirstName.getText(), txtSecondName.getText(), txtEmail.getText(), cmbRoles.getSelectedItem().toString(), pswdField.getPassword().toString());
-                    if (controller != null) {
+                    boolean isNotLastAdmin = true;
+                    if (cmbRoles.getSelectedIndex() == 1){
+                        if (checkLastAdmin()) isNotLastAdmin = false;
+                    }
+                    if (isNotLastAdmin) {
+                        User tmp = new User(txtLogin.getText(), txtFirstName.getText(), txtSecondName.getText(), txtEmail.getText(), cmbRoles.getSelectedItem().toString(), pswdField.getPassword().toString());
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         ObjectMapper mapper = new ObjectMapper();
                         try {
@@ -135,6 +132,8 @@ public class UsersSettings extends JFrame{
                         }
                         String data = "0" + out.toString();
                         controller.sendMessage(MessageType.CHANGE_USER, data);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Нельзя удалять последнего администратора!");
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "Вы не можете изменить текущего пользователя!");
@@ -156,17 +155,15 @@ public class UsersSettings extends JFrame{
                     }
                     if (isNewUser) {
                         User tmp = new User(txtLogin.getText().toLowerCase(), txtFirstName.getText(), txtSecondName.getText(), txtEmail.getText(), cmbRoles.getSelectedItem().toString(), String.valueOf(pswdField.getPassword()));
-                        if (controller != null) {
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            ObjectMapper mapper = new ObjectMapper();
-                            try {
-                                mapper.writeValue(out, tmp);
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                            String data = "1" + out.toString();
-                            controller.sendMessage(MessageType.CHANGE_USER, data);
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        ObjectMapper mapper = new ObjectMapper();
+                        try {
+                            mapper.writeValue(out, tmp);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
                         }
+                        String data = "1" + out.toString();
+                        controller.sendMessage(MessageType.CHANGE_USER, data);
                     } else {
                         JOptionPane.showMessageDialog(null,"Пользователь " + txtLogin.getText().toLowerCase() + " уже существует. Если хотите изменить данные используйте кнопку обновить.");
                     }
@@ -190,17 +187,29 @@ public class UsersSettings extends JFrame{
                         }
                     }
                     if (isLoginExist) {
-                        User tmp = new User(txtLogin.getText().toLowerCase(), txtFirstName.getText(), txtSecondName.getText(), txtEmail.getText(), cmbRoles.getSelectedItem().toString(), pswdField.getPassword().toString());
-                        if (controller != null) {
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            ObjectMapper mapper = new ObjectMapper();
-                            try {
-                                mapper.writeValue(out, tmp);
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
+                        boolean isNotLastAdmin = true;
+
+                        for (User u: users){
+                            if (u.getLogin().equals(txtLogin.getText()) && !u.getRole().equals(cmbRoles.getSelectedItem())) {
+                                    if (checkLastAdmin()) isNotLastAdmin = false;
                             }
-                            String data = "1" + out.toString();
-                            controller.sendMessage(MessageType.CHANGE_USER, data);
+                        }
+
+                        if(isNotLastAdmin) {
+                            User tmp = new User(txtLogin.getText().toLowerCase(), txtFirstName.getText(), txtSecondName.getText(), txtEmail.getText(), cmbRoles.getSelectedItem().toString(), String.valueOf(pswdField.getPassword()));
+                            if (controller != null) {
+                                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                                ObjectMapper mapper = new ObjectMapper();
+                                try {
+                                    mapper.writeValue(out, tmp);
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                }
+                                String data = "1" + out.toString();
+                                controller.sendMessage(MessageType.CHANGE_USER, data);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Нельзя менять роль последнего администратора!");
                         }
                     } else {
                         JOptionPane.showMessageDialog(null,"Пользователя " + txtLogin.getText().toLowerCase() + " не существует. Если хотите создать нового используйте кнопку создать.");
@@ -216,6 +225,15 @@ public class UsersSettings extends JFrame{
         pack();
         setVisible(true);
     }
+
+    private boolean checkLastAdmin() {
+        int count = 0;
+        for (User u: users){
+            if (u.getRole().equals("Administrator")) count++;
+        }
+        return count <= 1;
+    }
+
     private void clearFields(){
         txtLogin.setText("");
         txtFirstName.setText("");

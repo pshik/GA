@@ -240,51 +240,34 @@ public class ServerController {
         return isCorrect;
     }
 
-    public synchronized boolean changeRack(String userName, String s, String data) {
+    public synchronized boolean changeRack(String userName, Rack data, int action, String refList) {
         boolean isCorrect = false;
         ConcurrentMap tmp = base.getBase("Racks");
-        String rackName,columns,rows;
         try {
-            switch (s.toCharArray()[0]) {
-                // create new rack
-                case '0':
-                    if (data.split("-_-").length == 3) {
-                        rackName = data.split("-_-")[0];
-                        columns = data.split("-_-")[1];
-                        rows = data.split("-_-")[2];
-                        if (!racks.containsKey(rackName)) {
-                            Rack newRack = new Rack(rackName, Integer.parseInt(columns), Integer.parseInt(rows));
-                            racks.put(newRack.getName(), newRack);
-                            base.fillNewRack(newRack);
-                            isCorrect = true;
-                        } else {
-                            System.out.println("Rack already exist in base!!!!!");
+            switch (action){
+                case 0:
+                    racks.remove(data.getName());
+                    for (Object r : references.keySet()) {
+                        SAPReference o = (SAPReference) references.get(r);
+                        for (String t : o.getAllowedRacks()) {
+                            if (t.equals(data.getName())) {
+                                o.removeAllowedRack(data.getName());
+                            }
                         }
-                    } else {
-                        System.out.println("wrong data for creating new rack!!!!");
+                        references.replace(o.getReference(), o);
                     }
                     break;
-                // remove rack
-                // need check last rack!!!
-                case '1':
-                    rackName = data;
-                    if (racks.containsKey(rackName)) {
-                        racks.remove(rackName);
-                        for (Object r : references.keySet()) {
-                            SAPReference o = (SAPReference) references.get(r);
-                            for (String t : o.getAllowedRacks()) {
-                                if (t.equals(rackName)) {
-                                    o.removeAllowedRack(rackName);
-                                }
-                            }
-                            references.replace(o.getReference(), o);
-                        }
-                        isCorrect = true;
+                case 1:
+                    if (racks.containsKey(data.getName())) {
+                        racks.replace(data.getName(), data);
                     } else {
-                        System.out.println("Rack already exist in base!!!!!");
+                        racks.put(data.getName(), data);
                     }
+                    base.fillNewRack(data);
+                    changeLinkRackToRef(userName,data.getName(),refList);
                     break;
             }
+            isCorrect = true;
         } catch (Exception e) {
             racks = tmp;
         }
@@ -304,19 +287,16 @@ public class ServerController {
                       references.replace(sapReference.getReference(),sapReference);
                   }
               } else {
-
                   if (sapReference.isAllowedRack(rackName)){
                       sapReference.removeAllowedRack(rackName);
                       references.replace(sapReference.getReference(),sapReference);
                   }
               }
-
           }
             isCorrect = true;
         } catch (Exception e) {
             references = tmp;
         }
-
         return isCorrect;
     }
 

@@ -1,4 +1,4 @@
 package exceptions;
 
-public class CloseWindow extends Exception {
+public class CloseWindow extends RuntimeException {
 }

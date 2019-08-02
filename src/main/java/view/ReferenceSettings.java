@@ -3,10 +3,8 @@ package view;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import controller.ClientGuiController;
 import model.CheckListItem;
-import model.Pallet;
 import model.Rack;
 import model.SAPReference;
-import server.Message;
 import server.MessageType;
 
 import javax.swing.*;
@@ -21,8 +19,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static server.MessageType.USERS_UPDATE;
-
 public class ReferenceSettings extends JFrame{
     private JComboBox cmbReferences;
     private JButton btnUpdate;
@@ -32,8 +28,8 @@ public class ReferenceSettings extends JFrame{
     private JLabel lblNewRef;
     private JLabel lblDescription;
     private JComboBox cmbSize;
-    private JTextField txtfNewRef;
-    private JTextField txtfDescription;
+    private JTextField txtNewRef;
+    private JTextField txtDescription;
     private JList lstRacks;
     private JPanel pnlReferences;
     private JButton btnDelete;
@@ -87,17 +83,17 @@ public class ReferenceSettings extends JFrame{
                 lstRacks.setCellRenderer(new CheckListRenderer());
                 lstRacks.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 cmbSize.setSelectedIndex(currentRef.getSize()-1);
-                txtfDescription.setText(currentRef.getDescription());
+                txtDescription.setText(currentRef.getDescription());
             }
         });
         btnUpdate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String[] rackList = allowedRacks();
-                if (txtfDescription.getText().isEmpty()) {
+                if (txtDescription.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Заполните описание!");
                 } else {
-                    SAPReference tmp = new SAPReference(cmbReferences.getSelectedItem().toString(), txtfDescription.getText(), cmbSize.getSelectedIndex() + 1, rackList);
+                    SAPReference tmp = new SAPReference(cmbReferences.getSelectedItem().toString(), txtDescription.getText(), cmbSize.getSelectedIndex() + 1, rackList);
                     if (controller != null) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         ObjectMapper mapper = new ObjectMapper();
@@ -116,28 +112,28 @@ public class ReferenceSettings extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 String[] rackList = allowedRacks();
-                    SAPReference tmp = new SAPReference(cmbReferences.getSelectedItem().toString(), txtfDescription.getText(), cmbSize.getSelectedIndex() + 1, rackList);
-                    if (controller != null) {
-                        ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        ObjectMapper mapper = new ObjectMapper();
-                        try {
-                            mapper.writeValue(out, tmp);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                        String data = "0" + out.toString();
-                        controller.sendMessage(MessageType.CHANGE_REFERENCE, data);
+                SAPReference tmp = new SAPReference(cmbReferences.getSelectedItem().toString(), txtDescription.getText(), cmbSize.getSelectedIndex() + 1, rackList);
+                if (controller != null) {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        mapper.writeValue(out, tmp);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
                     }
+                    String data = "0" + out.toString();
+                    controller.sendMessage(MessageType.CHANGE_REFERENCE, data);
+                }
             }
         });
         btnCreate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String[] rackList = allowedRacks();
-                if (txtfNewRef.getText().isEmpty() || txtfDescription.getText().isEmpty()){
+                if (txtNewRef.getText().isEmpty() || txtDescription.getText().isEmpty()){
                     JOptionPane.showMessageDialog(null,"Введите название материала и описание!");
                 } else {
-                    SAPReference tmp = new SAPReference(txtfNewRef.getText(), txtfDescription.getText(), cmbSize.getSelectedIndex() + 1, rackList);
+                    SAPReference tmp = new SAPReference(txtNewRef.getText(), txtDescription.getText(), cmbSize.getSelectedIndex() + 1, rackList);
                     if (controller != null) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         ObjectMapper mapper = new ObjectMapper();

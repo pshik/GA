@@ -84,19 +84,6 @@
           <text value=""/>
         </properties>
       </component>
-      <component id="f7f87" class="javax.swing.JLabel" binding="lblSelectedCell">
-        <constraints>
-          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
-            <minimum-size width="40" height="20"/>
-            <preferred-size width="40" height="20"/>
-            <maximum-size width="40" height="20"/>
-          </grid>
-        </constraints>
-        <properties>
-          <name resource-bundle="properties/labelNames" key="lblSelectedCell"/>
-          <text value=""/>
-        </properties>
-      </component>
       <scrollpane id="75f9a" binding="scrollPane">
         <constraints>
           <grid row="0" column="0" row-span="5" col-span="5" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="1" use-parent-layout="false"/>
@@ -194,7 +181,7 @@
       <grid id="e3b56" binding="pnlManager" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
-          <grid row="2" column="5" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false">
+          <grid row="2" column="5" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <minimum-size width="300" height="60"/>
             <preferred-size width="300" height="60"/>
             <maximum-size width="300" height="60"/>
@@ -208,7 +195,9 @@
           <component id="84c15" class="javax.swing.JComboBox" binding="cmbManagerFunctions">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="184" height="30"/>
+                <minimum-size width="200" height="30"/>
+                <preferred-size width="200" height="30"/>
+                <maximum-size width="200" height="30"/>
               </grid>
             </constraints>
             <properties/>
@@ -216,9 +205,9 @@
           <component id="5fbbf" class="javax.swing.JButton" binding="btnRunManagerCommand">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                <minimum-size width="70" height="30"/>
-                <preferred-size width="70" height="30"/>
-                <maximum-size width="70" height="30"/>
+                <minimum-size width="60" height="30"/>
+                <preferred-size width="60" height="30"/>
+                <maximum-size width="60" height="30"/>
               </grid>
             </constraints>
             <properties>
@@ -248,6 +237,19 @@
           </component>
         </children>
       </scrollpane>
+      <component id="f7f87" class="javax.swing.JLabel" binding="lblSelectedCell">
+        <constraints>
+          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="40" height="20"/>
+            <preferred-size width="40" height="20"/>
+            <maximum-size width="40" height="20"/>
+          </grid>
+        </constraints>
+        <properties>
+          <name resource-bundle="properties/labelNames" key="lblSelectedCell"/>
+          <text value=""/>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>
