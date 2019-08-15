@@ -48,6 +48,7 @@ public class ClientGuiController {
       //  listOfManagersCommands.put(8,"Загрузить из ...");
       //  listOfManagersCommands.put(9,"Привязать материалы к стеллажу");
     }
+
     public String getCurrentUser() {
         return currentUser;
     }
@@ -98,6 +99,17 @@ public class ClientGuiController {
     public void setCurrentUser(String activeUser) {
         currentUser = activeUser;
     }
+
+    public boolean getCellStatus(String cell) {
+        for (Cell c: getModel().getCells()){
+
+            if (c.getCol().equals(cell.substring(0,1)) && c.getRow().equals(cell.substring(1,2))){
+                return c.isBlocked();
+            }
+        }
+        return false;
+    }
+
 
 
     class GuiSocketThread extends Thread{

@@ -240,7 +240,7 @@ public class ServerController {
         return isCorrect;
     }
 
-    public synchronized boolean changeRack(String userName, Rack data, int action, String refList) {
+    public synchronized boolean changeRack(String userName, Rack data, int action, String refList, String cellsList) {
         boolean isCorrect = false;
         ConcurrentMap tmp = base.getBase("Racks");
         try {
@@ -265,6 +265,25 @@ public class ServerController {
                     }
                     base.fillNewRack(data);
                     changeLinkRackToRef(userName,data.getName(),refList);
+                    if (!cellsList.equals("null")) {
+                        for (String c: cellsList.split(",")){
+                            String colName = c.substring(0,1);
+                            String rowNum = c.substring(1,2);
+                            Cell o = (Cell) cells.get(data.getName() + ":" + c);
+                            o.setBlocked(true);
+                            cells.replace(data.getName() + ":" + c,o);
+                        }
+                    } else {
+                        for (Object o : cells.values()){
+                            Cell t = (Cell) o;
+                            if (t.getRack().equals(data.getName())){
+                                if (t.isBlocked()){
+                                    t.setBlocked(false);
+                                    cells.replace(data.getName() + ":" + t.getCol() + t.getRow(),t);
+                                }
+                            }
+                        }
+                    }
                     break;
             }
             isCorrect = true;

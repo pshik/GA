@@ -3,6 +3,8 @@ package dao;
 
 import model.Cell;
 import model.Rack;
+import model.SAPReference;
+import model.User;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import server.Server;
@@ -64,5 +66,36 @@ public class Base {
             objects.add(tmp.get(o));
         }
         return objects;
+    }
+
+    public void initDefaultBase(String baseName) {
+        switch (baseName){
+            case "Users":
+                User user = new User("admin","Admin","GA",	"spb_admin03@grupoantolin.com",	"Administrator",	"12345");
+                getBase(baseName).put(user.getLogin(),user);
+                break;
+            case "References":
+                SAPReference reference = new SAPReference("Null","Null",1,"ChangeName");
+                getBase(baseName).put(reference.getReference(),reference);
+                break;
+            case "Racks":
+                Rack rack = new Rack("ChangeName",5,5);
+                getBase(baseName).put(rack.getName(),rack);
+                break;
+            case "Cells":
+                if (!getBase("Racks").isEmpty()) {
+                    ConcurrentMap racks = getBase("Racks");
+                    Rack changeName = (Rack) racks.get("ChangeName");
+                    int col = changeName.getCol();
+                    int row = changeName.getRow();
+
+                    for (int i = 0; i < row; i++) {
+                        for (int j = 0; j < col; j++) {
+                            getBase(baseName).put(changeName.getName() + ":" + colNames[j] + rowNames[row - i - 1], new Cell(changeName.getName(), colNames[j], rowNames[row - i - 1], null));
+                        }
+                    }
+                }
+            break;
+        }
     }
 }

@@ -30,7 +30,7 @@ public class ClientGUI extends JFrame{
     private JTextArea txtCellInfo;
     private JPanel pnlMain;
     private JLabel lblTableName;
-    private JScrollPane scrollPane;
+    private JScrollPane scrTable;
     private JLabel lblSelectedCell;
     private JRadioButton rbSelectDate;
     private JPanel pnlLogisticDriver;
@@ -42,6 +42,7 @@ public class ClientGUI extends JFrame{
     private JPanel pnlManager;
     private JComboBox cmbManagerFunctions;
     private JButton btnRunManagerCommand;
+    private JScrollPane scrDataPane;
     private ClientGuiController controller;
     private JComboBox cmbLogin = new JComboBox();
     private JPasswordField txtPassword = new JPasswordField();
@@ -65,29 +66,34 @@ public class ClientGUI extends JFrame{
         btnLoad.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (lblSelectedCell.getText().isEmpty()) JOptionPane.showMessageDialog(pnlMain,"Ячейка не выбрана, выберите ячейку.");
-                else {
-                    String manualDate = null;
-                    if (rbSelectDate.isSelected()){
+                if (lblSelectedCell.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(pnlMain,"Ячейка не выбрана, выберите ячейку.");
+                } else {
+                    if (controller.getCellStatus(lblSelectedCell.getText())) {
 
-                        Properties p = new Properties();
-                        p.put("text.today", "Today");
-                        p.put("text.month", "Month");
-                        p.put("text.year", "Year");
-                        UtilDateModel modelDateUtil = new UtilDateModel();
-                        JDatePanelImpl datePanel = new JDatePanelImpl(modelDateUtil,p);
-                        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel,new DateLabelFormatter());
-                        JOptionPane.showConfirmDialog(null, datePicker, "Выбор даты", JOptionPane.PLAIN_MESSAGE);
+                    } else {
+                        String manualDate = null;
+                        if (rbSelectDate.isSelected()) {
 
-                        Calendar cal = Calendar.getInstance();
-                        cal.set(datePicker.getModel().getYear(),datePicker.getModel().getMonth(),datePicker.getModel().getDay());
-                        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                        manualDate = format.format(cal.getTime());
-                        rbSelectDate.setSelected(false);
+                            Properties p = new Properties();
+                            p.put("text.today", "Today");
+                            p.put("text.month", "Month");
+                            p.put("text.year", "Year");
+                            UtilDateModel modelDateUtil = new UtilDateModel();
+                            JDatePanelImpl datePanel = new JDatePanelImpl(modelDateUtil, p);
+                            JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+                            JOptionPane.showConfirmDialog(null, datePicker, "Выбор даты", JOptionPane.PLAIN_MESSAGE);
+
+                            Calendar cal = Calendar.getInstance();
+                            cal.set(datePicker.getModel().getYear(), datePicker.getModel().getMonth(), datePicker.getModel().getDay());
+                            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                            manualDate = format.format(cal.getTime());
+                            rbSelectDate.setSelected(false);
+                        }
+
+                        controller.loadPallet(lblSelectedCell.getText(), cmbReference.getSelectedItem().toString(), lblTableName.getText(), manualDate);
+                        if (rbAvailableCells.isSelected()) rbAvailableCells.doClick();
                     }
-
-                    controller.loadPallet(lblSelectedCell.getText(),cmbReference.getSelectedItem().toString(),lblTableName.getText(),manualDate);
-                    if (rbAvailableCells.isSelected()) rbAvailableCells.doClick();
                 }
             }
         });
@@ -101,16 +107,17 @@ public class ClientGUI extends JFrame{
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                int row = mainTable.rowAtPoint(e.getPoint());
-                int col = mainTable.columnAtPoint(e.getPoint());
-                txtCellInfo.setText(colNames[col] + rowNames[mainTable.getRowCount() - row - 1]);
-                mainTable.getModel().isCellEditable(row,col);
+//                int row = mainTable.rowAtPoint(e.getPoint());
+//                int col = mainTable.columnAtPoint(e.getPoint());
+//                txtCellInfo.setText(colNames[col] + rowNames[mainTable.getRowCount() - row - 1]);
+//                mainTable.getModel().isCellEditable(row,col);
             }
         });
 
         rbAvailableCells.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshRack();
                 if (rbShowRef.isSelected()){
                     rbShowRef.doClick();
                 }
@@ -131,6 +138,7 @@ public class ClientGUI extends JFrame{
         rbShowRef.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                refreshRack();
                 if (rbAvailableCells.isSelected()){
                     rbAvailableCells.doClick();
                 }
@@ -153,6 +161,7 @@ public class ClientGUI extends JFrame{
         btnForcePickUp.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 if (rbAvailableCells.isSelected()){
                     rbAvailableCells.doClick();
                 }
@@ -192,6 +201,13 @@ public class ClientGUI extends JFrame{
         });
 
 
+        pnlMain.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                txtCellInfo.setText("");
+                lblSelectedCell.setText("");
+            }
+        });
     }
 
     private void showAvailableCells(String reference, String rackName, int stage) {
@@ -253,6 +269,7 @@ public class ClientGUI extends JFrame{
                         }
                         int row = mainTable.getRowCount() - Integer.parseInt(cell.getRow());
                         String valueAt = (String) mainTable.getValueAt(row, col);
+//                        System.out.println(row + ":" + col + " | "+ valueAt);
                         data.fillValues(valueAt);
                         switch (stage) {
                             case 0:
@@ -565,8 +582,6 @@ public class ClientGUI extends JFrame{
                                         break;
                                     //Привязка стеллажей к материалам
                                     case 9:
-//                                        LinkedWindow linkedWindow = new LinkedWindow();
-//                                        linkedWindow.initView(controller,listOfRacks,listOfReferences);
                                         break;
                                 }
                             }
@@ -578,6 +593,7 @@ public class ClientGUI extends JFrame{
             }
         });
         printTable(cmbRackName.getSelectedItem().toString());
+
     }
 
 
@@ -625,44 +641,48 @@ public class ClientGUI extends JFrame{
             header[i] = colNames[i];
         }
         TableModel tblModel = new TableModel(currentRackRowCount,currentRackColumnCount,header);
-        TableCellRenderer tableCellRenderer = new MyCellRender(scrollPane.getWidth(),currentRackColumnCount);
-        TableCellEditor tableCellEditor = new MyCellEditor(new JCheckBox(),scrollPane.getWidth(),currentRackColumnCount);
+        TableCellRenderer tableCellRenderer = new MyCellRender(scrTable.getWidth(),currentRackColumnCount);
+        TableCellEditor tableCellEditor = new MyCellEditor(new JCheckBox(), scrTable.getWidth(),currentRackColumnCount);
         mainTable.setModel(tblModel);
         JTable rowTable = new RowNumberTable(mainTable);
-        scrollPane.setRowHeaderView(rowTable);
+        scrTable.setRowHeaderView(rowTable);
         for (int i = 0; i < currentRackRowCount ; i++){
             for (int j = 0; j < currentRackColumnCount; j++) {
                 String value = "";
-                ArrayList<Pallet> pallets = cellsMap.get(colNames[j] + rowNames[currentRackRowCount - i]).getPallets();
-                if (pallets != null){
-                    DataBuilder data = new DataBuilder();
-                    for (Pallet pallet : pallets){
-                        position = pallet.getPosition();
-                        String currentValue = (String) mainTable.getValueAt(i,j);
-                        if (currentValue == null || currentValue.equals("") ) {
-                            data.setValue(position,pallet.getMaterial() + "<br>" +  pallet.getLoadingDate().format(dateTimeFormatter));
-                        } else{
-                            for (int k = 0 ; k < currentValue.split(",").length;k++){
-                                if (data.getValue(k).equals(" ")){
-                                    if (!currentValue.split(",")[k].equals(" ")){
-                                        data.setValue(k,currentValue.split(",")[k]);
+                if (!cellsMap.get(colNames[j] + rowNames[currentRackRowCount - i]).isBlocked()) {
+                    ArrayList<Pallet> pallets = cellsMap.get(colNames[j] + rowNames[currentRackRowCount - i]).getPallets();
+                    if (pallets != null) {
+                        DataBuilder data = new DataBuilder();
+                        for (Pallet pallet : pallets) {
+                            position = pallet.getPosition();
+                            String currentValue = (String) mainTable.getValueAt(i, j);
+                            if (currentValue == null || currentValue.equals("")) {
+                                data.setValue(position, pallet.getMaterial() + "<br>" + pallet.getLoadingDate().format(dateTimeFormatter));
+                            } else {
+                                for (int k = 0; k < currentValue.split(",").length; k++) {
+                                    if (data.getValue(k).equals(" ")) {
+                                        if (!currentValue.split(",")[k].equals(" ")) {
+                                            data.setValue(k, currentValue.split(",")[k]);
+                                        }
+                                    } else {
+                                        System.out.println("Error #1, position not empty");
                                     }
-                                }else {
-                                    System.out.println("Error #1, position not empty");
+                                }
+                                if (data.getValue(position).equals(" ")) {
+                                    data.setValue(position, pallet.getMaterial() + "<br>" + pallet.getLoadingDate().format(dateTimeFormatter));
+                                } else {
+                                    System.out.println("Error #2, position not empty");
                                 }
                             }
-                            if (data.getValue(position).equals(" ")){
-                                data.setValue(position,pallet.getMaterial() + "<br>" +  pallet.getLoadingDate().format(dateTimeFormatter));
-                            } else {
-                                System.out.println("Error #2, position not empty");
-                            }
-                        }
 
+                        }
+                        value = data.toString();
+                        //  System.out.println(colNames[j] + rowNames[currentRackRowCount-i] + ":"+value +":"+position);
+                    } else {
+                        //    System.out.println(cellsMap.get(colNames[j] + rowNames[currentRackRowCount - i]) + " | "+ i + " | " + j);
                     }
-                    value = data.toString();
-                    //   System.out.println(colNames[j] + rowNames[currentRackRowCount-i] + ":"+value +":"+position);
                 } else {
-                    System.out.println(cellsMap.get(colNames[j] + rowNames[currentRackRowCount - i]) + " | "+ i + " | " + j);
+                    value = "=,=,=,=,=,=";
                 }
                 mainTable.setValueAt(value,i,j);
                 mainTable.getColumnModel().getColumn(j).setCellEditor(tableCellEditor);
@@ -693,6 +713,8 @@ public class ClientGUI extends JFrame{
     }
     public void refreshRack() {
         printTable(cmbRackName.getSelectedItem().toString());
+        //for (int i = 0; i < cmbRackName )
+        //printTable(cmbRackName.getItemAt(0).toString());
     }
 
     public void refreshRackList() {
@@ -705,6 +727,11 @@ public class ClientGUI extends JFrame{
         for (String s: listOfRacks){
             cmbRackName.addItem(s);
         }
+    }
+
+    public void refreshView() {
+        refreshRackList();
+        refreshRack();
     }
 
     private class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {

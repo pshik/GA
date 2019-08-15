@@ -2,6 +2,7 @@ package view;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import controller.ClientGuiController;
+import model.Rack;
 import model.User;
 import server.MessageType;
 
@@ -12,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Set;
 
 public class UsersSettings extends JFrame{
     private JComboBox cmbUsers;
@@ -65,7 +67,7 @@ public class UsersSettings extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 controller.setBusy(false);
-                controller.getView().refreshRack();
+                controller.getView().refreshView();
                 dispose();
             }
         });

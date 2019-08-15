@@ -45,6 +45,18 @@ public class Server {
             e.printStackTrace();
         }
         base = Base.getInstance();
+        if (base.getBase("Users").isEmpty()){
+            base.initDefaultBase("Users");
+        }
+        if (base.getBase("References").isEmpty()){
+            base.initDefaultBase("References");
+        }
+        if (base.getBase("Racks").isEmpty()){
+            base.initDefaultBase("Racks");
+        }
+        if (base.getBase("Cells").isEmpty()){
+            base.initDefaultBase("Cells");
+        }
         serverController = ServerController.getServerController();
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             LoggerFiFo.getInstance().getRootLogger().log(Level.DEBUG,"Server is running!");
@@ -191,9 +203,10 @@ public class Server {
                         data = m.getData();
                         action = Integer.parseInt(data.substring(0,1));
                         String refList = data.split("-_-")[1];
+                        String cellsList = data.split("-_-")[2];
                         reader = new StringReader(data.substring(1).split("-_-")[0]);
                         Rack r = mapper.readValue(reader,Rack.class);
-                        isCorrect = serverController.changeRack(userName,r,action,refList);
+                        isCorrect = serverController.changeRack(userName,r,action,refList,cellsList);
                         if (isCorrect){
                             broadcastMessage(MessageType.RACK_UPDATE);
                         }

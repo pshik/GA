@@ -167,7 +167,7 @@ public class ReferenceSettings extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 if (controller !=null) {
                     controller.setBusy(false);
-                    controller.getView().refreshRack();
+                    controller.getView().refreshView();
                 }
                 dispose();
             }
@@ -197,31 +197,11 @@ public class ReferenceSettings extends JFrame{
         return rackList;
     }
     public static void main(String[] args) {
-        Rack test1 = new Rack("Rack1",6,7);
-        Rack test2 = new Rack("Rack2",7,5);
-        Rack test3 = new Rack("Rack3",5,4);
-        Rack test4 = new Rack("Rack4",5,7);
-        Rack test5 = new Rack("Rack5",4,6);
-        ArrayList<Rack> racks = new ArrayList<>();
-        racks.add(test1);
-        racks.add(test2);
-        racks.add(test3);
-        racks.add(test4);
-        racks.add(test5);
-        SAPReference reference = new SAPReference("61021230234-03","HL",1,"Rack1","Rack2","Rack3","Rack4","Rack5");
-        SAPReference reference1 = new SAPReference("61021230234-01","WR",1,"Rack1","Rack2","Rack3","Rack4","Rack5");
-        SAPReference reference2 = new SAPReference("14535322452-01","LR",2,"Rack1","Rack2","Rack5");
-        SAPReference reference3 = new SAPReference("14535322452","LR",3,"Rack1","Rack4","Rack5");
-        ArrayList<SAPReference> references = new ArrayList<>();
-        references.add(reference3);
-        references.add(reference);
-        references.add(reference1);
-        references.add(reference2);
-        references.add(reference3);
-        references.add(reference);
-        references.add(reference1);
-        references.add(reference2);
-        references.add(reference3);
-        new ReferenceSettings().initView(null,racks,references);
+//        String d = "D4";
+//        System.out.println(d.substring(0,1));
+//
+//        System.out.println(d.substring(1,2));
+        char c = 65;
+        System.out.println(c);
     }
 }

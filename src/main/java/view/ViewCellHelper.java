@@ -16,6 +16,7 @@ class ViewCellHelper {
     private final static Color DEFAULT_COLOR = new Color(255,228,225);
     private final static Color HIGHLIGHT_FIFO = new Color(255,165,0);
     private final static Color HIGHLIGHT = new Color(46,139,87);
+    private final static Color BLOCKED_COLOR = new Color(0,0,0);
 
     private  JButton button1;
     private  JButton button2;
@@ -149,6 +150,9 @@ class ViewCellHelper {
             tmp.setText("<HTML>" + label.substring(1) + "</HTML>");
             tmp.setForeground(Color.BLACK);
             tmp.setBackground(HIGHLIGHT);
+        } else if (label.startsWith("=")){
+            tmp.setText("<HTML></HTML>");
+            tmp.setBackground(BLOCKED_COLOR);
         } else {
             tmp.setText("<HTML>" + label + "</HTML>");
             tmp.setBackground(BUSY_COLOR);

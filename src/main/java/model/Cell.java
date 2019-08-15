@@ -1,23 +1,34 @@
 package model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.jetbrains.annotations.NotNull;
 import server.MessageType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
 @JsonAutoDetect
-public class Cell implements Serializable {
+public class Cell implements Serializable,Comparable<Cell> {
     private String rack;
     private String row;
     private String col;
     private ArrayList<Pallet> pallets = new ArrayList<>();
+    private boolean blocked;
 
     public Cell(String rack, String col, String row, Pallet pallet) {
         this.rack = rack;
         this.row = row;
         this.col = col;
         pallets.add(pallet);
+        blocked = false;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public String getRack() {
@@ -28,9 +39,10 @@ public class Cell implements Serializable {
     public String toString() {
         return "Cell{" +
                 "rack='" + rack + '\'' +
-                ", row=" + row +
-                ", col=" + col +
+                ", row='" + row + '\'' +
+                ", col='" + col + '\'' +
                 ", pallets=" + pallets +
+                ", blocked=" + blocked +
                 '}';
     }
 
@@ -56,12 +68,12 @@ public class Cell implements Serializable {
 
     public void addPallet(Pallet pallet) {
         // if size < max size add pallet
-        if (pallets.get(0) == null) {
-            pallets.clear();
-            pallets.add(pallet);
-        }
-        else pallets.add(pallet);
-        //else sent error
+        if (!isBlocked()) {
+            if (pallets.get(0) == null) {
+                pallets.clear();
+                pallets.add(pallet);
+            } else pallets.add(pallet);
+        }//else sent error
     }
 
     public void pickUpPallet(int position,String pallet) {
@@ -84,4 +96,8 @@ public class Cell implements Serializable {
     public Cell() {
     }
 
+    @Override
+    public int compareTo(@NotNull Cell o) {
+        return (getCol()+getRow()).compareTo(o.getCol() + o.getCol());
+    }
 }

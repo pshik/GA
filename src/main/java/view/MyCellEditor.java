@@ -62,6 +62,7 @@ class MyCellEditor extends DefaultCellEditor {
         });
     }
 
+
     private void setAddress(int i) {
         JTable mainTable = (JTable) panel.getParent();
         int row = mainTable.getEditingRow();
@@ -75,8 +76,14 @@ class MyCellEditor extends DefaultCellEditor {
                 JLabel label = (JLabel) c;
                 label.setText(mainTable.getColumnName(col) + (mainTable.getRowCount() - row) + "[" + i + "]");
             }
-            if(c.getName() != null && c.getName().equals("txtCellInfo")){
-                JTextArea txtArea = (JTextArea) c;
+            if(c.getName() != null && c.getName().equals("scrDataPane")){
+                JScrollPane tmpPanel = (JScrollPane) c;
+                JTextArea txtArea = new JTextArea();
+                for (Component comp: tmpPanel.getComponents()) {
+                    if (comp instanceof JViewport) {
+                        txtArea = (JTextArea) ((JViewport) comp).getComponent(0);
+                    }
+                }
                 String string = mainTable.getValueAt(row, col).toString();
                 if (!string.equals("")) {
                     String value = string.split(",")[i];
