@@ -231,7 +231,7 @@ public class ClientGUI extends JFrame{
                 }
                 int row = mainTable.getRowCount() - Integer.parseInt(cell.getRow());
                 data.clear();
-                if (cell.getPallets() == null){
+                if (cell.getPallets() == null && !cell.isBlocked()){
                       data.highlightFreeCell(size);
                       mainTable.setValueAt(data.toString(), row, col);
                 }else {
@@ -579,6 +579,10 @@ public class ClientGUI extends JFrame{
                                          break;
                                      //"Удалить пользователя"
                                     case 6:
+                                        break;
+                                    case 8:
+                                        ImportData importData = new ImportData();
+                                        importData.initView(controller);
                                         break;
                                     //Привязка стеллажей к материалам
                                     case 9:

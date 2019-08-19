@@ -45,7 +45,7 @@ public class ClientGuiController {
         listOfManagersCommands.put(5,"Управление пользователями");
        // listOfManagersCommands.put(6,"Удалить пользователя");
       //  listOfManagersCommands.put(7,"Выгрузить в ...");
-      //  listOfManagersCommands.put(8,"Загрузить из ...");
+        listOfManagersCommands.put(8,"Загрузить из ...");
       //  listOfManagersCommands.put(9,"Привязать материалы к стеллажу");
     }
 

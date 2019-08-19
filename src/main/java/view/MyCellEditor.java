@@ -87,7 +87,7 @@ class MyCellEditor extends DefaultCellEditor {
                 String string = mainTable.getValueAt(row, col).toString();
                 if (!string.equals("")) {
                     String value = string.split(",")[i];
-                    if (value != null && !value.equals("") && !value.equals("#") && !value.equals("*") && !value.equals("^") && !value.startsWith("@") && !value.startsWith(" ")) {
+                    if (value != null && !value.equals("") && !value.equals("=") && !value.equals("#") && !value.equals("*") && !value.equals("^") && !value.startsWith("@") && !value.startsWith(" ")) {
                         String[] data = value.split("<br>");
                         txtArea.setText(data[0] + "\n" + data[1]);
                     } else {

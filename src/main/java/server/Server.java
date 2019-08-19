@@ -211,6 +211,16 @@ public class Server {
                             broadcastMessage(MessageType.RACK_UPDATE);
                         }
                         break;
+                    case IMPORT_EXPORT:
+                        data = m.getData();
+                        action = Integer.parseInt(data.substring(0,1));
+                        reader = new StringReader(data.substring(1).split("-_-")[0]);
+                        SAPReference[] list = mapper.readValue(reader,SAPReference[].class);
+                        isCorrect = serverController.importExport(userName,action,list);
+                        if (isCorrect){
+                            broadcastMessage(MessageType.REFERENCE_UPDATE);
+                        }
+                        break;
                     case CHANGE_REFERENCE:
                         data = m.getData();
                         action = Integer.parseInt(data.substring(0,1));

@@ -369,4 +369,26 @@ public class ServerController {
 
         return isCorrect;
     }
+
+    public boolean importExport(String userName, int action, SAPReference[] list) {
+        boolean isCorrect = false;
+        for (Object o: list){
+            SAPReference ref = null;
+            try {
+                ref = (SAPReference) o;
+
+            } catch (Exception e){
+                System.out.println("Error during cast to SAPReference");
+            }
+            if (ref!=null){
+                if (references.containsKey(ref.getReference())){
+                    references.replace(ref.getReference(), ref);
+                } else {
+                    references.put(ref.getReference(),ref);
+                }
+            }
+            isCorrect = true;
+        }
+        return isCorrect;
+    }
 }
