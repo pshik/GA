@@ -35,7 +35,6 @@ public class RackSettings extends JFrame{
     private JList lstCells;
     private ArrayList<Rack> racks = new ArrayList<>();
     private ArrayList<SAPReference> references = new ArrayList<>();
-    private ArrayList<Cell> cells = new ArrayList<>();
 
     public RackSettings() {
         setTitle("Настройка стеллажей");
@@ -60,7 +59,6 @@ public class RackSettings extends JFrame{
         }
         racks.addAll(controller.getModel().getRacks());
         references.addAll(controller.getModel().getReferences());
-        cells.addAll(controller.getModel().getCells());
         CheckListItem[] checkBoxesReferences = new CheckListItem[references.size()];
 
         btnExit.addActionListener(new ActionListener() {
@@ -137,15 +135,9 @@ public class RackSettings extends JFrame{
                             currentRack = r;
                         }
                     }
-                    ArrayList<Cell> cellArrayList = new ArrayList<>();
-                    int countCell = 0;
-                    for (Cell c : cells){
-                        if (c.getRack().equals(cmbRacks.getSelectedItem().toString())){
-                            countCell++;
-                            cellArrayList.add(c);
-                        }
-                    }
-                    CheckListItem[] checkBoxesCells = new CheckListItem[countCell];
+                    Cell[][] cells = currentRack.getCells();
+
+                    CheckListItem[] checkBoxesCells = new CheckListItem[cells.length * cells[0].length];
                     Arrays.fill(checkBoxesReferences, null);
                     Arrays.fill(checkBoxesCells, null);
 
@@ -156,12 +148,16 @@ public class RackSettings extends JFrame{
                         }
                         checkBoxesReferences[i] = tmpCheckItem;
                     }
-                    for (int s = 0; s < cellArrayList.size(); s++){
-                        CheckListItem tmpCheckItem = new CheckListItem(cellArrayList.get(s).getCol()+cellArrayList.get(s).getRow());
-                        if (cellArrayList.get(s).isBlocked()) {
-                            tmpCheckItem.setSelected(true);
+                    int count = 0;
+                    for (int i = 0; i < currentRack.getRow(); i++) {
+                        for (int j = 0; j < currentRack.getCol(); j++) {
+                            CheckListItem tmpCheckItem = new CheckListItem(cells[i][j].getName());
+                            if (cells[i][j].isBlocked()) {
+                                tmpCheckItem.setSelected(true);
+                            }
+                            checkBoxesCells[count] = tmpCheckItem;
+                            count++;
                         }
-                        checkBoxesCells[s] = tmpCheckItem;
                     }
                     Arrays.sort(checkBoxesReferences);
                     Arrays.sort(checkBoxesCells);
@@ -211,8 +207,6 @@ public class RackSettings extends JFrame{
                 controller.setBusy(false);
                 references.clear();
                 references.addAll(controller.getModel().getReferences());
-                cells.clear();
-                cells.addAll(controller.getModel().getCells());
                 racks.clear();
                 racks.addAll(controller.getModel().getRacks());
                 addRacksToCmb(racks);
@@ -234,7 +228,31 @@ public class RackSettings extends JFrame{
     }
 
     private void sendData(ClientGuiController controller,int action){
-        Rack tmpRack = new Rack(fTxtRackName.getText(), Integer.parseInt(fTxtColumnNum.getText()), Integer.parseInt(fTxtRowsNum.getText()));
+        Rack tmpRack = new Rack(fTxtRackName.getText(), Integer.parseInt(fTxtRowsNum.getText()), Integer.parseInt(fTxtColumnNum.getText()),null);
+
+
+        ListModel referencesModel = lstReferences.getModel();
+        List<CheckListItem> selectedReferencesList = new ArrayList();
+        for (int i = 0; i < referencesModel.getSize(); i++){
+            CheckListItem element = (CheckListItem) referencesModel.getElementAt(i);
+            if (element.isSelected()){
+                selectedReferencesList.add(element);
+            }
+        }
+        String refString = "";
+        for (CheckListItem o: selectedReferencesList){
+            refString = refString + o.toString() + ",";
+        }
+
+        ListModel cellsModel = lstCells.getModel();
+        for (int i = 0; i < cellsModel.getSize(); i++){
+            CheckListItem element = (CheckListItem) cellsModel.getElementAt(i);
+            if (element.isSelected()){
+                Cell tmpCell = tmpRack.getCellByName(element.toString());
+                tmpCell.setBlocked(true);
+            }
+        }
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -242,36 +260,7 @@ public class RackSettings extends JFrame{
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
-        ListModel referencesModel = lstReferences.getModel();
-        List<CheckListItem> selectedValuesList = new ArrayList();
-        for (int i = 0; i < referencesModel.getSize(); i++){
-            CheckListItem element = (CheckListItem) referencesModel.getElementAt(i);
-            if (element.isSelected()){
-                selectedValuesList.add(element);
-            }
-        }
-        String refString = "";
-        for (CheckListItem o: selectedValuesList){
-            refString = refString + o.toString() + ",";
-        }
-        selectedValuesList.clear();
-        ListModel cellsModel = lstCells.getModel();
-        for (int i = 0; i < cellsModel.getSize(); i++){
-            CheckListItem element = (CheckListItem) cellsModel.getElementAt(i);
-            if (element.isSelected()){
-                selectedValuesList.add(element);
-            }
-        }
-        String cellsString = "";
-        if (selectedValuesList.size() == 0){
-            cellsString = "null";
-        } else {
-            for (CheckListItem o : selectedValuesList) {
-                cellsString = cellsString + o.toString() + ",";
-            }
-        }
-        String data = action + out.toString() + "-_-" + refString + "-_-" + cellsString;
+        String data = action + out.toString() + controller.getMESSAGE_DELIMITER() + refString;
         controller.sendMessage(MessageType.CHANGE_RACK, data);
     }
 }

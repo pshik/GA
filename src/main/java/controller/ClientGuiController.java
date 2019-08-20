@@ -34,9 +34,11 @@ public class ClientGuiController {
     private ArrayList<User> users = new ArrayList<>();
     private ArrayList<Rack> racks = new ArrayList<>();
     private ArrayList<SAPReference> references = new ArrayList<>();
-    private ArrayList<Cell> cells = new ArrayList<>();
     private boolean access = false;
     private boolean isBusy = false;
+    public String getMESSAGE_DELIMITER() {
+        return MESSAGE_DELIMITER;
+    }
     static {
       //  listOfManagersCommands.put(1,"Создать стеллаж");
        // listOfManagersCommands.put(2,"Удалить стеллаж");
@@ -44,8 +46,8 @@ public class ClientGuiController {
         listOfManagersCommands.put(4,"Управление стеллажами");
         listOfManagersCommands.put(5,"Управление пользователями");
        // listOfManagersCommands.put(6,"Удалить пользователя");
-      //  listOfManagersCommands.put(7,"Выгрузить в ...");
-        listOfManagersCommands.put(8,"Загрузить из ...");
+      //  listOfManagersCommands.put(7,"Отчеты");
+        listOfManagersCommands.put(8,"Загрузить материалы из .CSV");
       //  listOfManagersCommands.put(9,"Привязать материалы к стеллажу");
     }
 
@@ -87,11 +89,6 @@ public class ClientGuiController {
         System.exit(0);
     }
 
-
-    public void loadPallet(String cellFulPath, String refName, String lblTableName, Object b) {
-        sendMessage(MessageType.LOAD_PALLET,cellFulPath + "-_-" + refName + "-_-" + lblTableName + "-_-" + b);
-    }
-
     public void reload() {
         ClientGuiController.this.run();
     }
@@ -100,13 +97,18 @@ public class ClientGuiController {
         currentUser = activeUser;
     }
 
-    public boolean getCellStatus(String cell) {
-        for (Cell c: getModel().getCells()){
-
-            if (c.getCol().equals(cell.substring(0,1)) && c.getRow().equals(cell.substring(1,2))){
+    public boolean getCellStatus(String rackName, String cell) {
+        for (Rack r: racks){
+            if (r.getName().equals(rackName)){
+                Cell c = r.getCellByName(cell.substring(0,cell.indexOf("[")));
                 return c.isBlocked();
             }
         }
+//        for (Cell c: getModel().getCells()){
+//            if (c.getName().equals(cell)){
+//                return c.isBlocked();
+//            }
+//        }
         return false;
     }
 
@@ -171,17 +173,6 @@ public class ClientGuiController {
                                     view.refreshRack();
                                 }
                                 break;
-                            case CELL_UPDATE:
-                                connection.send(new Message(MessageType.CELL_UPDATE));
-                                message = connection.receive();
-                                if (message.getType() == MessageType.CELL_UPDATE) {
-                                    getBase(message);
-                                    model.updateCells(cells);
-                                }
-                                if (!isBusy) {
-                                    view.refreshRack();
-                                }
-                                break;
                             case USERS_UPDATE:
                                 connection.send(new Message(MessageType.USER_REQUEST));
                                 message = connection.receive();
@@ -191,7 +182,6 @@ public class ClientGuiController {
                                 }
                                 break;
                             case SERVER_IS_STOPPED:
-
                                 break;
                         }
                 }
@@ -244,12 +234,6 @@ public class ClientGuiController {
                         racks.clear();
                     racks.addAll(Arrays.asList(r));
                     break;
-                case CELL_UPDATE:
-                    Cell[] c = mapper.readValue(reader, Cell[].class);
-                    if(!cells.isEmpty())
-                        cells.clear();
-                    cells.addAll(Arrays.asList(c));
-                    break;
                 case USERS_UPDATE:
                     User[] u = mapper.readValue(reader, User[].class);
                     if(!users.isEmpty())
@@ -257,7 +241,6 @@ public class ClientGuiController {
                     users.addAll(Arrays.asList(u));
                     break;
                 case SERVER_IS_STOPPED:
-
                     break;
             }
         }
@@ -275,12 +258,6 @@ public class ClientGuiController {
             if (message.getType() == MessageType.RACK_UPDATE){
                 getBase(message);
                 model.updateRack(racks);
-            }
-            connection.send(new Message(MessageType.CELL_UPDATE));
-            message = connection.receive();
-            if (message.getType() == MessageType.CELL_UPDATE){
-                getBase(message);
-                model.updateCells(cells);
             }
             connection.send(new Message(MessageType.REFERENCE_REQUEST));
             message = connection.receive();

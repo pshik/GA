@@ -28,7 +28,7 @@ public class Server {
     private static int port;
     private static Base base;
     private static ServerController serverController;
-    private static int BLOCKED_DAYS = 4;
+    private static int BLOCKED_DAYS = 0;
     public static String pathToBase;
 
 
@@ -41,6 +41,7 @@ public class Server {
             properties.load(fileServerProperties);
             pathToBase = properties.getProperty("db.path");
             port = Integer.parseInt(properties.getProperty("server.port"));
+            BLOCKED_DAYS = Integer.parseInt(properties.getProperty("blocked.days"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,9 +55,7 @@ public class Server {
         if (base.getBase("Racks").isEmpty()){
             base.initDefaultBase("Racks");
         }
-        if (base.getBase("Cells").isEmpty()){
-            base.initDefaultBase("Cells");
-        }
+
         serverController = ServerController.getServerController();
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             LoggerFiFo.getInstance().getRootLogger().log(Level.DEBUG,"Server is running!");
@@ -159,23 +158,23 @@ public class Server {
                         data = messageData(users);
                         connection.send(new Message(MessageType.USERS_UPDATE, data));
                         break;
-                    case CELL_UPDATE:
-                        ConcurrentMap cells = base.getBase("Cells");
-                        data = messageData(cells);
-                        connection.send(new Message(MessageType.CELL_UPDATE, data));
-                        break;
+//                    case CELL_UPDATE:
+//                        ConcurrentMap cells = base.getBase("Cells");
+//                        data = messageData(cells);
+//                        connection.send(new Message(MessageType.CELL_UPDATE, data));
+//                        break;
                     case LOAD_PALLET:
                         data = m.getData();
                         isCorrect = serverController.loadPalletToRack(userName,data.split("-_-")[0],data.split("-_-")[1],data.split("-_-")[2],data.split("-_-")[3]);
                         if (isCorrect){
-                            broadcastMessage(MessageType.CELL_UPDATE);
+                            broadcastMessage(MessageType.RACK_UPDATE);
                         }
                         break;
                     case PICKUP_PALLET:
                         data = m.getData();
                         isCorrect = serverController.pickupPallet(userName,data.split("-_-")[0],data.split("-_-")[1],data.split("-_-")[2]);
                         if (isCorrect){
-                            broadcastMessage(MessageType.CELL_UPDATE);
+                            broadcastMessage(MessageType.RACK_UPDATE);
                         }
                         break;
                     case SETTINGS:
@@ -196,17 +195,16 @@ public class Server {
                         data = m.getData();
                         isCorrect = serverController.forcedPickUp(userName,data.split("-_-")[0],data.split("-_-")[1],data.split("-_-")[2]);
                         if (isCorrect){
-                            broadcastMessage(MessageType.CELL_UPDATE);
+                            broadcastMessage(MessageType.RACK_UPDATE);
                         }
                         break;
                     case CHANGE_RACK:
                         data = m.getData();
                         action = Integer.parseInt(data.substring(0,1));
                         String refList = data.split("-_-")[1];
-                        String cellsList = data.split("-_-")[2];
                         reader = new StringReader(data.substring(1).split("-_-")[0]);
                         Rack r = mapper.readValue(reader,Rack.class);
-                        isCorrect = serverController.changeRack(userName,r,action,refList,cellsList);
+                        isCorrect = serverController.changeRack(userName,r,action,refList);
                         if (isCorrect){
                             broadcastMessage(MessageType.RACK_UPDATE);
                         }

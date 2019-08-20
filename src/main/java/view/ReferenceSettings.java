@@ -33,6 +33,9 @@ public class ReferenceSettings extends JFrame{
     private JList lstRacks;
     private JPanel pnlReferences;
     private JButton btnDelete;
+    private JButton btnRefresh;
+    private ArrayList<Rack> racks = new ArrayList<>();
+    private ArrayList<SAPReference> references = new ArrayList<>();
 
     public ReferenceSettings() {
         setTitle("Настройка материалов");
@@ -47,43 +50,59 @@ public class ReferenceSettings extends JFrame{
         cmbSize.addItem("Large");
 
 
+
     }
 
-    public void initView(ClientGuiController controller, ArrayList<Rack> racks, ArrayList<SAPReference> references){
+    public void initView(ClientGuiController controller){
+
         if (controller != null)
         {
             controller.setBusy(true);
         }
 
         Collections.sort(references);
-
+        racks.addAll(controller.getModel().getRacks());
+        references.addAll(controller.getModel().getReferences());
         CheckListItem[] checkBoxes = new CheckListItem[racks.size()];
+
         cmbReferences.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SAPReference currentRef = null;
-                for (SAPReference r : references) {
-                    if (r.getReference().equals(cmbReferences.getSelectedItem())) {
-                        currentRef = r;
+                if (cmbReferences.getItemCount() != 0) {
+                    SAPReference currentRef = null;
+                    for (SAPReference r : references) {
+                        if (r.getReference().equals(cmbReferences.getSelectedItem())) {
+                            currentRef = r;
+                        }
                     }
-                }
 
-                for (int i = 0; i < checkBoxes.length; i++) {
-                    checkBoxes[i] = null;
-                }
-                for (int i = 0; i < racks.size(); i++) {
-                    CheckListItem tmpCheckItem = new CheckListItem(racks.get(i).getName());
-                    if (currentRef != null && currentRef.isAllowedRack(racks.get(i).getName())) {
-                        tmpCheckItem.setSelected(true);
+                    for (int i = 0; i < checkBoxes.length; i++) {
+                        checkBoxes[i] = null;
                     }
-                    checkBoxes[i] = tmpCheckItem;
+                    for (int i = 0; i < racks.size(); i++) {
+                        CheckListItem tmpCheckItem = new CheckListItem(racks.get(i).getName());
+                        if (currentRef != null && currentRef.isAllowedRack(racks.get(i).getName())) {
+                            tmpCheckItem.setSelected(true);
+                        }
+                        checkBoxes[i] = tmpCheckItem;
+                    }
+                    Arrays.sort(checkBoxes);
+                    lstRacks.setListData(checkBoxes);
+                    lstRacks.setCellRenderer(new CheckListRenderer());
+                    lstRacks.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+                    cmbSize.setSelectedIndex(currentRef.getSize() - 1);
+                    txtDescription.setText(currentRef.getDescription());
                 }
-                Arrays.sort(checkBoxes);
-                lstRacks.setListData(checkBoxes);
-                lstRacks.setCellRenderer(new CheckListRenderer());
-                lstRacks.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-                cmbSize.setSelectedIndex(currentRef.getSize()-1);
-                txtDescription.setText(currentRef.getDescription());
+            }
+        });
+        btnRefresh.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.setBusy(false);
+                references.clear();
+                references.addAll(controller.getModel().getReferences());
+                addRefToCmb(references);
+                controller.setBusy(true);
             }
         });
         btnUpdate.addActionListener(new ActionListener() {
@@ -173,11 +192,17 @@ public class ReferenceSettings extends JFrame{
             }
         });
 
-        for (SAPReference s: references){
-            cmbReferences.addItem(s.getReference());
-        }
+        addRefToCmb(references);
+
         pack();
         setVisible(true);
+    }
+    private void addRefToCmb(ArrayList<SAPReference> list) {
+        Collections.sort(list);
+        cmbReferences.removeAllItems();
+        for (SAPReference r: list){
+            cmbReferences.addItem(r.getReference());
+        }
     }
     private String[] allowedRacks (){
 

@@ -8,7 +8,6 @@ import model.User;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import server.Server;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -19,8 +18,6 @@ public class Base {
     private DB db;
     private HashMap<String, ConcurrentMap> baseMap = new HashMap<>();
     private static Base ourInstance = new Base();
-    private final String[] colNames = new String[]{"A","B","C","D","E","F","G","H","I"};
-    private final String[] rowNames = new String[]{"1","2","3","4","5","6","7","8","9"};
 
     public static Base getInstance() {
         return ourInstance;
@@ -32,7 +29,6 @@ public class Base {
         baseMap.put("Users",db.hashMap("UsersMap").createOrOpen());
         baseMap.put("References",db.hashMap("ReferencesMap").createOrOpen());
         baseMap.put("Racks",db.hashMap("RacksMap").createOrOpen());
-        baseMap.put("Cells",db.hashMap("CellsMap").createOrOpen());
     }
 
     public ConcurrentMap getBase(String mapName){
@@ -52,12 +48,15 @@ public class Base {
     public void fillNewRack(Rack rack){
             int col = rack.getCol();
             int row = rack.getRow();
+            Cell[][] cells = new Cell[row][col];
 
             for (int i = 0; i < row ; i++){
                 for (int j = 0; j < col; j++){
-                    getBase("Cells").put(rack.getName() + ":" + colNames[j]+rowNames[row-i-1],new Cell(rack.getName(),colNames[j],rowNames[row-i-1],null));
+                    String cellName = String.valueOf((char) (65 + j)) + (row-i);
+                    cells[i][j] = new Cell(cellName,i, j, null);
                 }
             }
+            rack.setCells(cells);
     }
     public ArrayList<Object> getDataList (String mapName){
         ArrayList<Object> objects = new ArrayList<>();
@@ -79,23 +78,19 @@ public class Base {
                 getBase(baseName).put(reference.getReference(),reference);
                 break;
             case "Racks":
-                Rack rack = new Rack("ChangeName",5,5);
-                getBase(baseName).put(rack.getName(),rack);
-                break;
-            case "Cells":
-                if (!getBase("Racks").isEmpty()) {
-                    ConcurrentMap racks = getBase("Racks");
-                    Rack changeName = (Rack) racks.get("ChangeName");
-                    int col = changeName.getCol();
-                    int row = changeName.getRow();
-
-                    for (int i = 0; i < row; i++) {
-                        for (int j = 0; j < col; j++) {
-                            getBase(baseName).put(changeName.getName() + ":" + colNames[j] + rowNames[row - i - 1], new Cell(changeName.getName(), colNames[j], rowNames[row - i - 1], null));
-                        }
+                String name = "ChangeName";
+                int col = 5;
+                int row = 5;
+                Cell[][] cells = new Cell[row][col];
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
+                        String cellName = String.valueOf((char) (65 + j)) + (row-i);
+                        cells[i][j] = new Cell(cellName,i, j, null);
                     }
                 }
-            break;
+                Rack rack = new Rack(name,col,row,cells);
+                getBase(baseName).put(rack.getName(),rack);
+                break;
         }
     }
 }

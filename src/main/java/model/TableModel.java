@@ -20,7 +20,7 @@ public class TableModel extends AbstractTableModel {
     }
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        data[rowIndex][columnIndex] = (String) aValue;
+        data[rowIndex][columnIndex] =  aValue;
         fireTableCellUpdated(rowIndex, columnIndex);
     }
 

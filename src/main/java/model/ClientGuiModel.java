@@ -7,7 +7,6 @@ import java.util.Set;
 public class ClientGuiModel {
     private final Set<User> users = new HashSet<>();
     private final Set<Rack> racks = new HashSet<>();
-    private final Set<Cell> cells = new HashSet<>();
     private final Set<SAPReference> references = new HashSet<>();
 
     public Set<User> getUsers() {
@@ -16,10 +15,6 @@ public class ClientGuiModel {
 
     public Set<Rack> getRacks() {
         return racks;
-    }
-
-    public Set<Cell> getCells() {
-        return cells;
     }
 
     public Set<SAPReference> getReferences() {
@@ -43,14 +38,7 @@ public class ClientGuiModel {
             racks.addAll(list);
         }
     }
-    public void updateCells(ArrayList<Cell> list) {
-        if (cells.isEmpty()) {
-            cells.addAll(list);
-        }else {
-            cells.clear();
-            cells.addAll(list);
-        }
-    }
+
     public void updateReferences(ArrayList<SAPReference> list) {
         if (references.isEmpty()) {
             references.addAll(list);

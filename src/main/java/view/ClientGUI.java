@@ -48,9 +48,6 @@ public class ClientGUI extends JFrame{
     private JPasswordField txtPassword = new JPasswordField();
     private String activeUser;
 
-
-    private final String[] colNames = new String[]{"A","B","C","D","E","F","G","H","I"};
-    private final String[] rowNames = new String[]{"0","1","2","3","4","5","6","7","8","9"};
     private int position;
     private static final int ROW_HEIGHT = 90;
 
@@ -69,7 +66,7 @@ public class ClientGUI extends JFrame{
                 if (lblSelectedCell.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(pnlMain,"Ячейка не выбрана, выберите ячейку.");
                 } else {
-                    if (controller.getCellStatus(lblSelectedCell.getText())) {
+                    if (controller.getCellStatus(lblTableName.getText(),lblSelectedCell.getText())) {
 
                     } else {
                         String manualDate = null;
@@ -90,8 +87,11 @@ public class ClientGUI extends JFrame{
                             manualDate = format.format(cal.getTime());
                             rbSelectDate.setSelected(false);
                         }
-
-                        controller.loadPallet(lblSelectedCell.getText(), cmbReference.getSelectedItem().toString(), lblTableName.getText(), manualDate);
+                        String message = lblSelectedCell.getText() + controller.getMESSAGE_DELIMITER()
+                                + cmbReference.getSelectedItem().toString() + controller.getMESSAGE_DELIMITER()
+                                + lblTableName.getText() + controller.getMESSAGE_DELIMITER()
+                                + manualDate;
+                        controller.sendMessage(MessageType.LOAD_PALLET,message);
                         if (rbAvailableCells.isSelected()) rbAvailableCells.doClick();
                     }
                 }
@@ -101,16 +101,6 @@ public class ClientGUI extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 showMaterialForPickUP(cmbReference.getSelectedItem().toString(), false);
-            }
-        });
-        mainTable.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-//                int row = mainTable.rowAtPoint(e.getPoint());
-//                int col = mainTable.columnAtPoint(e.getPoint());
-//                txtCellInfo.setText(colNames[col] + rowNames[mainTable.getRowCount() - row - 1]);
-//                mainTable.getModel().isCellEditable(row,col);
             }
         });
 
@@ -220,66 +210,65 @@ public class ClientGUI extends JFrame{
             }
         }
         DataBuilder data = new DataBuilder();
-        for (Cell cell : controller.getModel().getCells()) {
-            if (cell.getRack().equals(rackName)) {
-                int col = 0;
-                for (int i = 0; i < colNames.length; i++) {
-                    if (colNames[i].equals(cell.getCol())) {
-                        col = i;
-                        break;
+        for (Rack rack : controller.getModel().getRacks()) {
+            if (rack.getName().equals(rackName)) {
+                Cell[][] cells = rack.getCells();
+                for (int i = 0; i < rack.getRow(); i++) {
+                    for (int j = 0; j < rack.getCol(); j++) {
+                        int col = cells[i][j].getCol();
+                        int row = cells[i][j].getRow();
+                        data.clear();
+                        if (cells[i][j].getPallets() == null && !cells[i][j].isBlocked()){
+                            data.highlightFreeCell(size);
+                            mainTable.setValueAt(data.toString(), row, col);
+                        }else {
+                            String valueAt = (String) mainTable.getValueAt(row, col);
+                            data.fillValues(valueAt);
+                            switch (stage) {
+                                case 0:
+                                    data.checkAvailablePositions(size);
+                                    mainTable.setValueAt(data.toString(), row, col);
+                                    break;
+                                case 1:
+                                    data.removeHighlighting();
+                                    mainTable.setValueAt(data.toString(), row, col);
+                                    break;
+                            }
+                        }
                     }
-                }
-                int row = mainTable.getRowCount() - Integer.parseInt(cell.getRow());
-                data.clear();
-                if (cell.getPallets() == null && !cell.isBlocked()){
-                      data.highlightFreeCell(size);
-                      mainTable.setValueAt(data.toString(), row, col);
-                }else {
-                    String valueAt = (String) mainTable.getValueAt(row, col);
-                    data.fillValues(valueAt);
-                        switch (stage) {
-                            case 0:
-                                data.checkAvailablePositions(size);
-                                mainTable.setValueAt(data.toString(), row, col);
-                                break;
-                            case 1:
-                                data.removeHighlighting();
-                                mainTable.setValueAt(data.toString(), row, col);
-                                break;
-                }
                 }
             }
         }
     }
 
     private void showAllRefOnRack(String reference, String rackName, int stage) {
+        for (Rack rack : controller.getModel().getRacks()) {
+            if (rack.getName().equals(rackName)){
+                Cell[][] cells = rack.getCells();
+                for (int i = 0; i < rack.getRow(); i++){
+                    for (int j = 0; j < rack.getCol(); j++){
+                        if (cells[i][j].isContainReference(reference)){
+                            for (Pallet pallet : cells[i][j].getPallets()) {
+                                if (pallet.getMaterial().equals(reference)) {
+                                    DataBuilder data = new DataBuilder();
 
-        for (Cell cell : controller.getModel().getCells()) {
-            if (cell.getRack().equals(rackName) && cell.isContainReference(reference)) {
-                for (Pallet pallet : cell.getPallets()) {
-                    if (pallet.getMaterial().equals(reference)) {
-                        DataBuilder data = new DataBuilder();
-
-                        int col = 0;
-                        for (int i = 0; i < colNames.length; i++) {
-                            if (colNames[i].equals(cell.getCol())) {
-                                col = i;
-                                break;
+                                    int col = cells[i][j].getCol();
+                                    //int row = mainTable.getRowCount() - cells[i][j].getRow()-1;
+                                    int row = cells[i][j].getRow();
+                                    String valueAt = (String) mainTable.getValueAt(row, col);
+                                    data.fillValues(valueAt);
+                                    switch (stage) {
+                                        case 0:
+                                            data.highlightValue(pallet.getPosition(), "showAll");
+                                            mainTable.setValueAt(data.toString(), row, col);
+                                            break;
+                                        case 1:
+                                            data.removeHighlighting(pallet.getPosition());
+                                            mainTable.setValueAt(data.toString(), row, col);
+                                            break;
+                                    }
+                                }
                             }
-                        }
-                        int row = mainTable.getRowCount() - Integer.parseInt(cell.getRow());
-                        String valueAt = (String) mainTable.getValueAt(row, col);
-//                        System.out.println(row + ":" + col + " | "+ valueAt);
-                        data.fillValues(valueAt);
-                        switch (stage) {
-                            case 0:
-                                data.highlightValue(pallet.getPosition(), "showAll");
-                                mainTable.setValueAt(data.toString(), row, col);
-                                break;
-                            case 1:
-                                data.removeHighlighting(pallet.getPosition());
-                                mainTable.setValueAt(data.toString(), row, col);
-                                break;
                         }
                     }
                 }
@@ -289,40 +278,46 @@ public class ClientGUI extends JFrame{
 
     private void showMaterialForPickUP(String material, boolean isForced) {
         if (isForced){
-
-            controller.sendMessage(MessageType.FORCED_PICKUP, lblSelectedCell.getText() + "-_-" + material + "-_-" + lblTableName.getText());
+            controller.sendMessage(MessageType.FORCED_PICKUP, lblSelectedCell.getText()
+                    + controller.getMESSAGE_DELIMITER() + material
+                    + controller.getMESSAGE_DELIMITER() + lblTableName.getText());
         } else {
             TreeMap<Pallet, String> map = new TreeMap<>();
             LocalDateTime currentDate = LocalDateTime.now();
             currentDate = currentDate.minusDays(controller.BLOCKED_DAYS);
-            Set<Cell> cells = controller.getModel().getCells();
-            for (Cell cell : cells) {
-                if (cell.getPallets() != null && cell.isContainReference(material)) {
-                    for (Pallet p : cell.getPallets()) {
-                        if (p.getMaterial().equals(material)) {
-                            LocalDateTime loadingDate = p.getLoadingDate();
-                            if (loadingDate.isBefore(currentDate)) {
-                                map.put(p, cell.getRack() + "," + cell.getRow() + "," + cell.getCol());
+            for (Rack rack: controller.getModel().getRacks()){
+                Cell[][] cells = rack.getCells();
+                for (int i = 0; i < rack.getRow(); i++) {
+                    for (int j = 0; j < rack.getCol(); j++) {
+                        if (cells[i][j].getPallets() != null && cells[i][j].isContainReference(material)) {
+                            for (Pallet p : cells[i][j].getPallets()) {
+                                if (p.getMaterial().equals(material)) {
+                                    LocalDateTime loadingDate = p.getLoadingDate();
+                                    if (loadingDate.isBefore(currentDate)) {
+                                        map.put(p, rack.getName() + "," + cells[i][j].getName());
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
+
             if (!map.isEmpty()) {
                 Pallet pallet = map.firstKey();
                 String s = map.get(pallet);
                 String rackString = s.split(",")[0];
-                String rowString = s.split(",")[1];
-                String colString = s.split(",")[2];
-                if (rackString.equals(lblTableName.getText())) {
-                    int col = 0;
-                    for (int i = 0; i < colNames.length; i++) {
-                        if (colNames[i].equals(colString)) {
-                            col = i;
-                            break;
-                        }
+                String cellString = s.split(",")[1];
+                Rack rack = null;
+                for (Rack r : controller.getModel().getRacks()){
+                    if (r.getName().equals(rackString)){
+                        rack = r;
                     }
-                    int row = mainTable.getRowCount() - Integer.parseInt(rowString);
+                }
+                Cell cell = rack.getCellByName(cellString);
+                if (rackString.equals(lblTableName.getText())) {
+                    int col = cell.getCol();
+                    int row = mainTable.getRowCount() - cell.getRow();
                     String valueAt = (String) mainTable.getValueAt(row, col);
                     DataBuilder data = new DataBuilder();
                     data.fillValues(valueAt);
@@ -332,7 +327,7 @@ public class ClientGUI extends JFrame{
                     Object[] options = {"Да, снять паллет",
                             "Нет, отменить"};
                     int n = JOptionPane.showOptionDialog(pnlMain,
-                            "Снять паллет с материалом " + pallet.getMaterial() + " из ячейки " + colString + rowString + " или отменить действие?",
+                            "Снять паллет с материалом " + pallet.getMaterial() + " из ячейки " + cellString + " или отменить действие?",
                             "Снятие паллета",
                             JOptionPane.YES_NO_CANCEL_OPTION,
                             JOptionPane.QUESTION_MESSAGE,
@@ -341,7 +336,7 @@ public class ClientGUI extends JFrame{
                             options[1]);
                     switch (n) {
                         case 0:
-                            controller.sendMessage(MessageType.PICKUP_PALLET, colString + rowString + "[" + pallet.getPosition() + "]" + "-_-" + pallet.getMaterial() + "-_-" + rackString);
+                            controller.sendMessage(MessageType.PICKUP_PALLET, cellString + "[" + pallet.getPosition() + "]" + "-_-" + pallet.getMaterial() + "-_-" + rackString);
                             break;
                         case 1:
                             data.removeHighlighting(pallet.getPosition());
@@ -489,8 +484,8 @@ public class ClientGUI extends JFrame{
 
     public void mainView() {
         setContentPane(pnlMain);
-        cmbRackName.setMaximumRowCount(5);
-        cmbReference.setMaximumRowCount(5);
+        cmbRackName.setMaximumRowCount(10);
+        cmbReference.setMaximumRowCount(15);
         User tmpUser = null;
         for (User u : controller.getModel().getUsers()){
             if (u.getLogin().equals(controller.getCurrentUser())){
@@ -536,36 +531,17 @@ public class ClientGUI extends JFrame{
                         TreeMap<Integer, String> listOfManagersCommands = controller.getListOfManagersCommands();
                         for (Integer k: listOfManagersCommands.keySet()){
                             if (listOfManagersCommands.get(k).equals(command)){
-                                String answer1,answer2,answer3,answer4,answer5,answer6,answer7,answer8;
-                                ArrayList<Rack> listOfRacks = new ArrayList<>();
-                                for (Rack r : controller.getModel().getRacks()){
-                                    listOfRacks.add(r);
-                                }
-                                ArrayList<SAPReference> listOfReferences = new ArrayList<>();
-                                for (SAPReference s : controller.getModel().getReferences()){
-                                    listOfReferences.add(s);
-                                }
-                                ArrayList<User> listOfUsers = new ArrayList<>();
-                                for (User u : controller.getModel().getUsers()){
-                                    listOfUsers.add(u);
-                                }
                                 switch (k){
                                     //"Создать стеллаж"
                                     case 1:
-//                                        answer1  = JOptionPane.showInputDialog(pnlMain,"Введите название стеллажа: ");
-//                                        answer2  = JOptionPane.showInputDialog(pnlMain,"Введите кол-во колонок: ");
-//                                        answer3  = JOptionPane.showInputDialog(pnlMain,"Введите кол-во строк: ");
-//                                        controller.sendMessage(MessageType.CHANGE_RACK,0 + controller.MESSAGE_DELIMITER + answer1 + controller.MESSAGE_DELIMITER + answer2 + controller.MESSAGE_DELIMITER + answer3);
                                         break;
                                     //"Удалить стеллаж"
                                     case 2:
-//                                        answer1  = JOptionPane.showInputDialog(pnlMain,"Введите название стеллажа: ");
-//                                        controller.sendMessage(MessageType.CHANGE_RACK,1 + controller.MESSAGE_DELIMITER + answer1);
-                                        break;
+                                       break;
                                     //"Управление материалами"
                                     case 3:
                                         ReferenceSettings referenceSettings = new ReferenceSettings();
-                                        referenceSettings.initView(controller,listOfRacks,listOfReferences);
+                                        referenceSettings.initView(controller);
                                         break;
                                     //"Управление стеллажами"
                                     case 4:
@@ -632,17 +608,13 @@ public class ClientGUI extends JFrame{
 
         int currentRackRowCount = rack.getRow();
         int currentRackColumnCount = rack.getCol();
-        HashMap<String, Cell> cellsMap = new HashMap<>();
-        for (Cell c : controller.getModel().getCells() ){
-            if(c.getRack().equals(tableName)) {
-                cellsMap.put(c.getCol()+c.getRow(),c);
-            }
-        }
+        Cell[][] cells = rack.getCells();
 
         lblTableName.setText(rack.getName());
+
         String[] header = new String[currentRackColumnCount];
-        for (int i = 0 ; i < currentRackColumnCount; i++){
-            header[i] = colNames[i];
+        for (int j = 0 ; j < currentRackColumnCount; j++){
+            header[j] = String.valueOf((char) (65 + j));
         }
         TableModel tblModel = new TableModel(currentRackRowCount,currentRackColumnCount,header);
         TableCellRenderer tableCellRenderer = new MyCellRender(scrTable.getWidth(),currentRackColumnCount);
@@ -653,8 +625,8 @@ public class ClientGUI extends JFrame{
         for (int i = 0; i < currentRackRowCount ; i++){
             for (int j = 0; j < currentRackColumnCount; j++) {
                 String value = "";
-                if (!cellsMap.get(colNames[j] + rowNames[currentRackRowCount - i]).isBlocked()) {
-                    ArrayList<Pallet> pallets = cellsMap.get(colNames[j] + rowNames[currentRackRowCount - i]).getPallets();
+                if (!cells[i][j].isBlocked()) {
+                    ArrayList<Pallet> pallets = cells[i][j].getPallets();
                     if (pallets != null) {
                         DataBuilder data = new DataBuilder();
                         for (Pallet pallet : pallets) {

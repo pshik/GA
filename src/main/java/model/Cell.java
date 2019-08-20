@@ -2,21 +2,20 @@ package model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.jetbrains.annotations.NotNull;
-import server.MessageType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
 @JsonAutoDetect
 public class Cell implements Serializable,Comparable<Cell> {
-    private String rack;
-    private String row;
-    private String col;
+    private String name;
+    private int row;
+    private int col;
     private ArrayList<Pallet> pallets = new ArrayList<>();
     private boolean blocked;
 
-    public Cell(String rack, String col, String row, Pallet pallet) {
-        this.rack = rack;
+    public Cell(String name, int row, int col, Pallet pallet) {
+        this.name = name;
         this.row = row;
         this.col = col;
         pallets.add(pallet);
@@ -31,14 +30,14 @@ public class Cell implements Serializable,Comparable<Cell> {
         this.blocked = blocked;
     }
 
-    public String getRack() {
-        return rack;
+    public String getName() {
+        return name;
     }
 
     @Override
     public String toString() {
         return "Cell{" +
-                "rack='" + rack + '\'' +
+                "name='" + name + '\'' +
                 ", row='" + row + '\'' +
                 ", col='" + col + '\'' +
                 ", pallets=" + pallets +
@@ -46,11 +45,11 @@ public class Cell implements Serializable,Comparable<Cell> {
                 '}';
     }
 
-    public String getRow() {
+    public int getRow() {
         return row;
     }
 
-    public String getCol() {
+    public int getCol() {
         return col;
     }
 
@@ -69,7 +68,10 @@ public class Cell implements Serializable,Comparable<Cell> {
     public void addPallet(Pallet pallet) {
         // if size < max size add pallet
         if (!isBlocked()) {
-            if (pallets.get(0) == null) {
+            if (pallets == null ){
+                pallets = new ArrayList<>();
+                pallets.add(pallet);
+            } else if (pallets.get(0) == null) {
                 pallets.clear();
                 pallets.add(pallet);
             } else pallets.add(pallet);
@@ -98,6 +100,6 @@ public class Cell implements Serializable,Comparable<Cell> {
 
     @Override
     public int compareTo(@NotNull Cell o) {
-        return (getCol()+getRow()).compareTo(o.getCol() + o.getCol());
+        return name.compareTo(o.name);
     }
 }

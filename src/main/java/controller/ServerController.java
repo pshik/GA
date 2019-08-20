@@ -1,12 +1,11 @@
 package controller;
 
 import dao.Base;
+import log.Event;
 import log.LogParser;
 import log.LoggerFiFo;
 import model.*;
-import view.Logon;
 
-import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ public class ServerController {
     private static ConcurrentMap users = base.getBase("Users");
     private static ConcurrentMap references = base.getBase("References");
     private static ConcurrentMap racks = base.getBase("Racks");
-    private static ConcurrentMap cells = base.getBase("Cells");
     private ArrayList<User> connectedUser = new ArrayList<>();
 
     public ArrayList<User> getConnectedUser() {
@@ -49,30 +47,10 @@ public class ServerController {
     public static void main(String[] args) {
       //  System.setProperty("log4j.configurationFile","./myData/log4j2.xml");
         LogParser log = LogParser.getInstance();
-        new Logon(serverController,base).setVisible(true);
+
        // if (serverController.isAccess()){
 
        // }
-    }
-
-    public static Base getBase() {
-        return base;
-    }
-
-    public static ConcurrentMap getUsers() {
-        return users;
-    }
-
-    public static ConcurrentMap getReferences() {
-        return references;
-    }
-
-    public static ConcurrentMap getRacks() {
-        return racks;
-    }
-
-    public static ConcurrentMap getCells() {
-        return cells;
     }
 
     public void printLog(){
@@ -136,12 +114,10 @@ public class ServerController {
                 localSize = 1;
                 break;
         }
-        Cell o;
-        if( (o = (Cell) cells.get(lblTableName + ":" + cellName)) == null){
-            o = new Cell(lblTableName,String.valueOf(tmpRack.getCol()+1),String.valueOf(tmpRack.getRow()+1), pallet);
-        }else {
-            if (o.getPallets() != null) {
-                for (Pallet p : o.getPallets()) {
+        Cell cell = tmpRack.getCellByName(cellName);
+
+            if (cell.getPallets() != null) {
+                for (Pallet p : cell.getPallets()) {
                     if (p.getPosition() == pos) {
                         System.out.println("Ячейка занята");
                   //      JOptionPane.showMessageDialog(pnlMain, "Ячейка занята");
@@ -154,10 +130,10 @@ public class ServerController {
                         }
                     }
                 }
-                o.addPallet(pallet);
+                cell.addPallet(pallet);
             } else {
                 if (material.getSize() <= localSize) {
-                    o.addPallet(pallet);
+                    cell.addPallet(pallet);
                 }
                 else {
                     System.out.println("Не корректное размещение палета");
@@ -165,11 +141,11 @@ public class ServerController {
                     isBusy = true;
                 }
             }
-        }
 
         if (!isBusy) {
-            cells.replace(lblTableName + ":" + cellName, o);
-
+            tmpRack.setCellByAddress(cell.getRow(),cell.getCol(),cell);
+            //cells.replace(lblTableName + ":" + cellName, o);
+            racks.replace(tmpRack.getName(),tmpRack);
             LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: Load pallet. %s %s %s",currentUser,tmpRack.getName(),cellName,material.getReference()));
             LogParser.getInstance().updateLog();
           //  loadHistory();
@@ -181,109 +157,87 @@ public class ServerController {
     public synchronized boolean pickupPallet(String currentUser, String cellFulPath, String refName, String lblTableName){
         boolean isCorrect = false;
 
-        ConcurrentMap tmp = base.getBase("Cells");
+        ConcurrentMap tmp = base.getBase("Racks");
+        Rack tmpRack = (Rack) racks.get(lblTableName);
         int pos = Integer.parseInt(cellFulPath.substring(cellFulPath.indexOf("[")+1,cellFulPath.indexOf("]")));
         String cellName = cellFulPath.substring(0,cellFulPath.indexOf("["));
+
         boolean isExist = true;
         try{
-            Cell o;
-            if( (o = (Cell) cells.get(lblTableName + ":" + cellName)) == null){
-                System.out.println("В ячейке пусто.");
-            }else {
-                for (Pallet pallet: o.getPallets()){
+            Cell cell = tmpRack.getCellByName(cellName);
+                for (Pallet pallet: cell.getPallets()){
                     if (pallet.getPosition() == pos){
                         if(pallet.getMaterial().equals(refName)){
-                            o.pickUpPallet(pos,refName);
+                            cell.pickUpPallet(pos,refName);
                             isExist = false;
                         }
                     }
                 }
-            }
             if (isExist){
                 System.out.println("Ячейка не содержит нужный вам материал.");
             } else {
-                cells.replace(lblTableName + ":" + cellName,o);
+                tmpRack.setCellByAddress(cell.getRow(),cell.getCol(),cell);
+                racks.replace(tmpRack.getName(),tmpRack);
                 LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: PickUp pallet. %s %s %s",currentUser,lblTableName,cellName,refName));
                 LogParser.getInstance().updateLog();
                 isCorrect = true;
             }
         } catch (Exception e){
-            cells = tmp;
+            racks = tmp;
         }
 
         return isCorrect;
     }
     public synchronized boolean forcedPickUp(String currentUser, String cellFulPath, String refName, String lblTableName){
         boolean isCorrect = false;
-        ConcurrentMap tmp = base.getBase("Cells");
+        ConcurrentMap tmp = base.getBase("Racks");
+        Rack rack = (Rack) racks.get(lblTableName);
         int pos = Integer.parseInt(cellFulPath.substring(cellFulPath.indexOf("[") + 1, cellFulPath.indexOf("]")));
         String cellName = cellFulPath.substring(0, cellFulPath.indexOf("["));
         try {
-            Cell o;
-            if ((o = (Cell) cells.get(lblTableName + ":" + cellName)) == null) {
-                System.out.println("В ячейке пусто.");
-            } else {
-                for (Pallet pallet : o.getPallets()) {
+            Cell cell = rack.getCellByName(cellName);
+                for (Pallet pallet : cell.getPallets()) {
                     if (pallet.getPosition() == pos) {
-                        o.pickUpPallet(pos, refName);
+                        cell.pickUpPallet(pos, refName);
                     }
                 }
-                cells.replace(lblTableName + ":" + cellName, o);
+                rack.setCellByAddress(cell.getRow(),cell.getCol(),cell);
+                racks.replace(rack.getName(), rack);
                 LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: PickUp pallet. %s %s %s", currentUser, lblTableName, cellName, refName));
                 LogParser.getInstance().updateLog();
                 isCorrect = true;
-            }
         } catch (Exception e) {
-            cells = tmp;
+            racks = tmp;
         }
 
         return isCorrect;
     }
 
-    public synchronized boolean changeRack(String userName, Rack data, int action, String refList, String cellsList) {
+    public synchronized boolean changeRack(String userName, Rack rack, int action, String refList) {
         boolean isCorrect = false;
         ConcurrentMap tmp = base.getBase("Racks");
         try {
             switch (action){
                 case 0:
-                    racks.remove(data.getName());
+                    racks.remove(rack.getName());
                     for (Object r : references.keySet()) {
                         SAPReference o = (SAPReference) references.get(r);
                         for (String t : o.getAllowedRacks()) {
-                            if (t.equals(data.getName())) {
-                                o.removeAllowedRack(data.getName());
+                            if (t.equals(rack.getName())) {
+                                o.removeAllowedRack(rack.getName());
                             }
                         }
                         references.replace(o.getReference(), o);
                     }
                     break;
                 case 1:
-                    if (racks.containsKey(data.getName())) {
-                        racks.replace(data.getName(), data);
+                    if (racks.containsKey(rack.getName())) {
+                        racks.replace(rack.getName(), rack);
                     } else {
-                        racks.put(data.getName(), data);
+                        racks.put(rack.getName(), rack);
                     }
-                    base.fillNewRack(data);
-                    changeLinkRackToRef(userName,data.getName(),refList);
-                    if (!cellsList.equals("null")) {
-                        for (String c: cellsList.split(",")){
-                            String colName = c.substring(0,1);
-                            String rowNum = c.substring(1,2);
-                            Cell o = (Cell) cells.get(data.getName() + ":" + c);
-                            o.setBlocked(true);
-                            cells.replace(data.getName() + ":" + c,o);
-                        }
-                    } else {
-                        for (Object o : cells.values()){
-                            Cell t = (Cell) o;
-                            if (t.getRack().equals(data.getName())){
-                                if (t.isBlocked()){
-                                    t.setBlocked(false);
-                                    cells.replace(data.getName() + ":" + t.getCol() + t.getRow(),t);
-                                }
-                            }
-                        }
-                    }
+                    base.fillNewRack(rack);
+                    changeLinkRackToRef(userName,rack.getName(),refList);
                     break;
             }
             isCorrect = true;
@@ -390,5 +344,16 @@ public class ServerController {
             isCorrect = true;
         }
         return isCorrect;
+    }
+
+    private void loadHistory() {
+     //   txtaHistory.setText("");
+        ArrayList<Event> events = LogParser.getInstance().getEvents();
+        for (Event e: events){
+            if (e.getLevel().equals("INFO")){
+            //    txtaHistory.append(e.getMessage() + "\n");
+            }
+        }
+
     }
 }
