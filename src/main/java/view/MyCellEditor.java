@@ -1,5 +1,7 @@
 package view;
 
+import org.apache.logging.log4j.core.appender.db.jpa.JpaAppender;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -72,29 +74,35 @@ class MyCellEditor extends DefaultCellEditor {
         JPanel panel = (JPanel) pane.getParent();
         Component[] components = panel.getComponents();
         for (Component c: components){
-            if(c.getName() != null && c.getName().equals("lblSelectedCell")){
-                JLabel label = (JLabel) c;
-                label.setText(mainTable.getColumnName(col) + (mainTable.getRowCount() - row) + "[" + i + "]");
-            }
-            if(c.getName() != null && c.getName().equals("scrDataPane")){
-                JScrollPane tmpPanel = (JScrollPane) c;
-                JTextArea txtArea = new JTextArea();
-                for (Component comp: tmpPanel.getComponents()) {
-                    if (comp instanceof JViewport) {
-                        txtArea = (JTextArea) ((JViewport) comp).getComponent(0);
+            if (c.getName() != null && c.getName().equals("pnlRight")) {
+                JPanel tempP = (JPanel) c;
+                Component[] components1 = tempP.getComponents();
+                for (Component comp : components1) {
+                    if (comp.getName() != null && comp.getName().equals("lblSelectedCell")) {
+                        JLabel label = (JLabel) comp;
+                        label.setText(mainTable.getColumnName(col) + (mainTable.getRowCount() - row) + "[" + i + "]");
                     }
-                }
-                String string = mainTable.getValueAt(row, col).toString();
-                if (!string.equals("")) {
-                    String value = string.split(",")[i];
-                    if (value != null && !value.equals("") && !value.equals("=") && !value.equals("#") && !value.equals("*") && !value.equals("^") && !value.startsWith("@") && !value.startsWith(" ")) {
-                        String[] data = value.split("<br>");
-                        txtArea.setText(data[0] + "\n" + data[1]);
-                    } else {
-                        txtArea.setText("");
+                    if(comp.getName() != null && comp.getName().equals("scrDataPane")){
+                        JScrollPane tmpPanel = (JScrollPane) comp;
+                        JTextArea txtArea = new JTextArea();
+                        for (Component component: tmpPanel.getComponents()) {
+                            if (component instanceof JViewport) {
+                                txtArea = (JTextArea) ((JViewport) component).getComponent(0);
+                            }
+                        }
+                        String string = mainTable.getValueAt(row, col).toString();
+                        if (!string.equals("")) {
+                            String value = string.split(",")[i];
+                            if (value != null && !value.equals("") && !value.equals("=") && !value.equals("#") && !value.equals("*") && !value.equals("^") && !value.startsWith("@") && !value.startsWith(" ")) {
+                                String[] data = value.split("<br>");
+                                txtArea.setText(data[0] + "\n" + data[1]);
+                            } else {
+                                txtArea.setText("");
+                            }
+                        } else {
+                            txtArea.setText("");
+                        }
                     }
-                } else {
-                    txtArea.setText("");
                 }
             }
         }

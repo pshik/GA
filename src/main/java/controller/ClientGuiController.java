@@ -1,6 +1,7 @@
 package controller;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import exceptions.CloseWindow;
@@ -15,12 +16,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.*;
 
 
 public class ClientGuiController {
     public int BLOCKED_DAYS = 0;
     public String MESSAGE_DELIMITER = "-_-";
+    private static int logDays = 3;
     private static int serverPort;
     private static String serverAddress;
 
@@ -34,18 +37,26 @@ public class ClientGuiController {
     private ArrayList<User> users = new ArrayList<>();
     private ArrayList<Rack> racks = new ArrayList<>();
     private ArrayList<SAPReference> references = new ArrayList<>();
+    private TreeMap<LocalDateTime,String> log = new TreeMap<>(Collections.reverseOrder());
     private boolean access = false;
     private boolean isBusy = false;
     public String getMESSAGE_DELIMITER() {
         return MESSAGE_DELIMITER;
     }
+    public Map<String,String> events = new HashMap<String, String>() {{
+        put("SECURITY", "SECURITY");
+        put("DEBUG", "DEBUG");
+        put("INFO", "INFO");
+        put("WARN", "WARN");
+        put("ERROR", "ERROR");
+    }};
     static {
       //  listOfManagersCommands.put(1,"Создать стеллаж");
        // listOfManagersCommands.put(2,"Удалить стеллаж");
         listOfManagersCommands.put(3,"Управление материалами");
         listOfManagersCommands.put(4,"Управление стеллажами");
         listOfManagersCommands.put(5,"Управление пользователями");
-       // listOfManagersCommands.put(6,"Удалить пользователя");
+        listOfManagersCommands.put(6,"Загрузить из .CSV палеты");
       //  listOfManagersCommands.put(7,"Отчеты");
         listOfManagersCommands.put(8,"Загрузить материалы из .CSV");
       //  listOfManagersCommands.put(9,"Привязать материалы к стеллажу");
@@ -61,6 +72,10 @@ public class ClientGuiController {
         return listOfManagersCommands;
     }
 
+    public int getLogDays() {
+        return logDays;
+    }
+
     public boolean isBusy() {
         return isBusy;
     }
@@ -72,7 +87,9 @@ public class ClientGuiController {
     public void setAccess(boolean b) {
         access = b;
     }
-
+    public TreeMap<LocalDateTime,String> getLog (){
+        return log;
+    }
     public boolean isAccess() {
         return access;
     }
@@ -104,11 +121,6 @@ public class ClientGuiController {
                 return c.isBlocked();
             }
         }
-//        for (Cell c: getModel().getCells()){
-//            if (c.getName().equals(cell)){
-//                return c.isBlocked();
-//            }
-//        }
         return false;
     }
 
@@ -182,6 +194,12 @@ public class ClientGuiController {
                                 }
                                 break;
                             case SERVER_IS_STOPPED:
+                                break;
+                            case LOG_UPDATED:
+                                connection.send(new Message(MessageType.LOG_REQUEST));
+                                message = connection.receive();
+                                updateLog(message);
+                                view.refreshLog();
                                 break;
                         }
                 }
@@ -272,9 +290,16 @@ public class ClientGuiController {
                     BLOCKED_DAYS = Integer.parseInt(message.getData().split(":=")[1]);
                }
             }
+            connection.send(new Message(MessageType.LOG_REQUEST));
+            message = connection.receive();
+            if (message.getType() == MessageType.LOG_REQUEST){
+                updateLog(message);
+            }
             view.mainView();
         }
     }
+
+
 
 
     private Thread getSocketThread() {
@@ -302,6 +327,24 @@ public class ClientGuiController {
         }
     }
 
+    private void updateLog(Message message) {
+        String data = message.getData();
+        StringReader reader = new StringReader(data);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        TreeMap<LocalDateTime,String> s = new TreeMap<>(Collections.reverseOrder());
+        try {
+            TypeReference<TreeMap<LocalDateTime, String>> typeRef
+                    = new TypeReference<TreeMap<LocalDateTime, String>>() {};
+            s = mapper.readValue(reader, typeRef);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        log.clear();
+        log = s;
+        view.refreshLog();
+    }
+
     public static void main (String[] args){
         Properties properties = new Properties();
         FileInputStream fileServerProperties ;
@@ -311,6 +354,7 @@ public class ClientGuiController {
             properties.load(fileServerProperties);
             serverAddress = properties.getProperty("server.ip");
             serverPort = Integer.parseInt(properties.getProperty("server.port"));
+            logDays = Integer.parseInt(properties.getProperty("days.for.log"));
         } catch (IOException e) {
             e.printStackTrace();
         }

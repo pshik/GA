@@ -1,7 +1,9 @@
 package server;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import controller.ServerController;
 import dao.Base;
@@ -17,9 +19,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -55,7 +59,7 @@ public class Server {
         if (base.getBase("Racks").isEmpty()){
             base.initDefaultBase("Racks");
         }
-
+        //base.getBase("References").clear();
         serverController = ServerController.getServerController();
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             LoggerFiFo.getInstance().getRootLogger().log(Level.DEBUG,"Server is running!");
@@ -158,11 +162,20 @@ public class Server {
                         data = messageData(users);
                         connection.send(new Message(MessageType.USERS_UPDATE, data));
                         break;
-//                    case CELL_UPDATE:
-//                        ConcurrentMap cells = base.getBase("Cells");
-//                        data = messageData(cells);
-//                        connection.send(new Message(MessageType.CELL_UPDATE, data));
-//                        break;
+                    case LOG_REQUEST:
+                     //   @JsonSerialize(keyUsing = MyPairSerializer.class)
+                        Map<LocalDateTime, String> infoLog = serverController.getInfoLog();
+                   //     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        ObjectMapper om = new ObjectMapper();
+
+                        om.registerModule(new JavaTimeModule());
+                        om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                        String jsonResult = om.writerWithDefaultPrettyPrinter()
+                                .writeValueAsString(infoLog);
+                //        om.writeValueAsString(infoLog);
+
+                        connection.send(new Message(MessageType.LOG_REQUEST, jsonResult));
+                        break;
                     case LOAD_PALLET:
                         data = m.getData();
                         isCorrect = serverController.loadPalletToRack(userName,data.split("-_-")[0],data.split("-_-")[1],data.split("-_-")[2],data.split("-_-")[3]);
@@ -213,7 +226,7 @@ public class Server {
                         data = m.getData();
                         action = Integer.parseInt(data.substring(0,1));
                         reader = new StringReader(data.substring(1).split("-_-")[0]);
-                        SAPReference[] list = mapper.readValue(reader,SAPReference[].class);
+                        Object[] list = mapper.readValue(reader,Object[].class);
                         isCorrect = serverController.importExport(userName,action,list);
                         if (isCorrect){
                             broadcastMessage(MessageType.REFERENCE_UPDATE);
@@ -229,12 +242,28 @@ public class Server {
                             broadcastMessage(MessageType.REFERENCE_UPDATE);
                         }
                         break;
-                    case CHANGE_LINK_RACK_TO_REF:
+                    case EVENT:
                         data = m.getData();
-                        isCorrect = serverController.changeLinkRackToRef(userName,data.split("-_-")[0],data.split("-_-")[1]);
-                        if (isCorrect){
-                            broadcastMessage(MessageType.REFERENCE_UPDATE);
+                        String level = data.split("-_-")[0];
+                        String message = data.split("-_-")[1];
+                        switch (level){
+                            case "SECURITY":
+                                LoggerFiFo.getInstance().getRootLogger().log(Level.forName("SECURITY", 350), message);
+                                break;
+                            case "DEBUG":
+                                LoggerFiFo.getInstance().getRootLogger().log(Level.DEBUG, message);
+                                break;
+                            case "INFO":
+                                LoggerFiFo.getInstance().getRootLogger().log(Level.INFO, message);
+                                break;
+                            case "WARN":
+                                LoggerFiFo.getInstance().getRootLogger().log(Level.WARN, message);
+                                break;
+                            case "ERROR":
+                                LoggerFiFo.getInstance().getRootLogger().log(Level.ERROR, message);
+                                break;
                         }
+
                         break;
                     case CHANGE_USER:
                         data = m.getData();

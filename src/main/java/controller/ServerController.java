@@ -8,7 +8,7 @@ import model.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
 public class ServerController {
@@ -203,19 +203,19 @@ public class ServerController {
                 }
                 rack.setCellByAddress(cell.getRow(),cell.getCol(),cell);
                 racks.replace(rack.getName(), rack);
-                LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: PickUp pallet. %s %s %s", currentUser, lblTableName, cellName, refName));
+                LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: Force pickup pallet. %s %s %s", currentUser, lblTableName, cellName, refName));
                 LogParser.getInstance().updateLog();
                 isCorrect = true;
         } catch (Exception e) {
             racks = tmp;
         }
-
         return isCorrect;
     }
 
-    public synchronized boolean changeRack(String userName, Rack rack, int action, String refList) {
+    public synchronized boolean changeRack(String currentUser, Rack rack, int action, String refList) {
         boolean isCorrect = false;
         ConcurrentMap tmp = base.getBase("Racks");
+        String actionString = "";
         try {
             switch (action){
                 case 0:
@@ -229,6 +229,7 @@ public class ServerController {
                         }
                         references.replace(o.getReference(), o);
                     }
+                    actionString="remove";
                     break;
                 case 1:
                     if (racks.containsKey(rack.getName())) {
@@ -237,17 +238,20 @@ public class ServerController {
                         racks.put(rack.getName(), rack);
                     }
                     base.fillNewRack(rack);
-                    changeLinkRackToRef(userName,rack.getName(),refList);
+                    changeLinkRackToRef(rack.getName(),refList);
+                    actionString="change";
                     break;
             }
             isCorrect = true;
+            LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: %s rack: %s", currentUser,actionString, rack.getName()));
+            LogParser.getInstance().updateLog();
         } catch (Exception e) {
             racks = tmp;
         }
         return isCorrect;
     }
 
-    public boolean changeLinkRackToRef(String userName, String rackName, String referencesList) {
+    public boolean changeLinkRackToRef(String rackName, String referencesList) {
         boolean isCorrect = false;
         ConcurrentMap tmp = base.getBase("References");
         try {
@@ -273,25 +277,30 @@ public class ServerController {
         return isCorrect;
     }
 
-    public boolean changeReference(String userName, SAPReference data, int action) {
+    public boolean changeReference(String currentUser, SAPReference reference, int action) {
         boolean isCorrect = false;
         ConcurrentMap tmp = base.getBase("References");
-
+        String actionString = "";
         try {
             switch (action){
                 case 0:
-                    references.remove(data.getReference());
+                    references.remove(reference.getReference());
+                    actionString = "delete";
                     break;
                 case 1:
 
-                    if (references.containsKey(data.getReference())) {
-                        references.replace(data.getReference(), data);
+                    if (references.containsKey(reference.getReference())) {
+                        references.replace(reference.getReference(), reference);
+                        actionString = "change";
                     } else {
-                        references.put(data.getReference(), data);
+                        references.put(reference.getReference(), reference);
+                        actionString = "create";
                     }
                     break;
             }
             isCorrect = true;
+            LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: %s reference: %s", currentUser,actionString, reference.getReference()));
+            LogParser.getInstance().updateLog();
         } catch (Exception e) {
             references = tmp;
         }
@@ -299,24 +308,29 @@ public class ServerController {
         return isCorrect;
     }
 
-    public boolean changeUser(String userName, User data, int action) {
+    public boolean changeUser(String currentUser, User user, int action) {
         boolean isCorrect = false;
         ConcurrentMap tmp = base.getBase("Users");
-
+        String actionString = "";
         try {
             switch (action){
                 case 0:
-                    users.remove(data.getLogin());
+                    users.remove(user.getLogin());
+                    actionString = "delete";
                     break;
                 case 1:
-                    if (users.containsKey(data.getLogin())) {
-                        users.replace(data.getLogin(), data);
+                    if (users.containsKey(user.getLogin())) {
+                        users.replace(user.getLogin(), user);
+                        actionString = "change";
                     } else {
-                        users.put(data.getLogin(), data);
+                        users.put(user.getLogin(), user);
+                        actionString = "create";
                     }
                     break;
             }
             isCorrect = true;
+            LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: %s user: %s", currentUser,actionString, user.getLogin()));
+            LogParser.getInstance().updateLog();
         } catch (Exception e) {
             users = tmp;
         }
@@ -324,36 +338,62 @@ public class ServerController {
         return isCorrect;
     }
 
-    public boolean importExport(String userName, int action, SAPReference[] list) {
+    public boolean importExport(String userName, int action, Object[] list) {
         boolean isCorrect = false;
-        for (Object o: list){
-            SAPReference ref = null;
-            try {
-                ref = (SAPReference) o;
-
-            } catch (Exception e){
-                System.out.println("Error during cast to SAPReference");
-            }
-            if (ref!=null){
-                if (references.containsKey(ref.getReference())){
-                    references.replace(ref.getReference(), ref);
-                } else {
-                    references.put(ref.getReference(),ref);
+        switch (action) {
+            case 0:
+                for (Object o : list) {
+                    SAPReference ref = null;
+                    try {
+                        LinkedHashMap<String,Object> test = (LinkedHashMap<String, Object>) o;
+                     //   ref = (SAPReference) o;
+                        String reference = (String) test.get("reference");
+                        String description = (String) test.get("description");
+                        int size = (int) test.get("size");
+                        ArrayList<String> allowedRacks = (ArrayList<String>) test.get("allowedRacks");
+                        String[] allowed = new String[allowedRacks.size()];
+                        for (int i = 0; i < allowedRacks.size(); i++){
+                            allowed[i] = allowedRacks.get(i);
+                        }
+                        ref = new SAPReference(reference, description , size,  allowed);
+                    } catch (Exception e) {
+                        System.out.println("Error during cast to SAPReference");
+                    }
+                    if (ref != null) {
+                        if (references.containsKey(ref.getReference())) {
+                            references.replace(ref.getReference(), ref);
+                        } else {
+                            references.put(ref.getReference(), ref);
+                        }
+                    }
                 }
-            }
-            isCorrect = true;
+                isCorrect = true;
+                break;
+            case 1:
+               // loadPalletToRack(String currentUser, String cellFulPath, String refName, String lblTableName, String manualDate)
+                for (Object o : list) {
+                    String line = (String) o;
+                    String[] data = line.split("-_-");
+                    String cellPath = data[3];
+                    String reference = data[1];
+                    String rackName = data[0];
+                    String dateLoaded = data[2];
+                    loadPalletToRack(userName,cellPath,reference,rackName,dateLoaded);
+                }
+                isCorrect = true;
+                break;
         }
         return isCorrect;
     }
 
-    private void loadHistory() {
-     //   txtaHistory.setText("");
+    public TreeMap<LocalDateTime,String> getInfoLog() {
         ArrayList<Event> events = LogParser.getInstance().getEvents();
+        TreeMap<LocalDateTime,String> infoMessages = new TreeMap<>(Collections.reverseOrder());
         for (Event e: events){
             if (e.getLevel().equals("INFO")){
-            //    txtaHistory.append(e.getMessage() + "\n");
+                infoMessages.put(e.getDateTime(),e.getMessage());
             }
         }
-
+        return infoMessages;
     }
 }

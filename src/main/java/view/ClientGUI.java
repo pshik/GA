@@ -6,11 +6,13 @@ import model.*;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
+import server.Message;
 import server.MessageType;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.ParseException;
@@ -43,6 +45,9 @@ public class ClientGUI extends JFrame{
     private JComboBox cmbManagerFunctions;
     private JButton btnRunManagerCommand;
     private JScrollPane scrDataPane;
+    private JTextArea txtaLog;
+    private JScrollPane sclLog;
+    private JPanel pnlRight;
     private ClientGuiController controller;
     private JComboBox cmbLogin = new JComboBox();
     private JPasswordField txtPassword = new JPasswordField();
@@ -107,6 +112,7 @@ public class ClientGUI extends JFrame{
         rbAvailableCells.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String material = cmbReference.getSelectedItem().toString();
                 refreshRack();
                 if (rbShowRef.isSelected()){
                     rbShowRef.doClick();
@@ -115,12 +121,12 @@ public class ClientGUI extends JFrame{
                     cmbReference.setEnabled(false);
                     btnPickUp.setEnabled(false);
                     controller.setBusy(true);
-                    showAvailableCells(cmbReference.getSelectedItem().toString(),lblTableName.getText(),0);
+                    showAvailableCells(material,lblTableName.getText(),0);
                 } else {
                     cmbReference.setEnabled(true);
                     btnPickUp.setEnabled(true);
                     controller.setBusy(false);
-                    showAvailableCells(cmbReference.getSelectedItem().toString(),lblTableName.getText(),1);
+                    showAvailableCells(material,lblTableName.getText(),1);
                     refreshRack();
                 }
             }
@@ -128,6 +134,7 @@ public class ClientGUI extends JFrame{
         rbShowRef.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String material = cmbReference.getSelectedItem().toString();
                 refreshRack();
                 if (rbAvailableCells.isSelected()){
                     rbAvailableCells.doClick();
@@ -137,13 +144,13 @@ public class ClientGUI extends JFrame{
                     btnLoad.setEnabled(false);
                     btnPickUp.setEnabled(false);
                     controller.setBusy(true);
-                    showAllRefOnRack(cmbReference.getSelectedItem().toString(),lblTableName.getText(),0);
+                    showAllRefOnRack(material,lblTableName.getText(),0);
                 } else {
                     cmbReference.setEnabled(true);
                     btnLoad.setEnabled(true);
                     btnPickUp.setEnabled(true);
                     controller.setBusy(false);
-                    showAllRefOnRack(cmbReference.getSelectedItem().toString(),lblTableName.getText(),1);
+                    showAllRefOnRack(material,lblTableName.getText(),1);
                     refreshRack();
                 }
             }
@@ -285,6 +292,7 @@ public class ClientGUI extends JFrame{
             TreeMap<Pallet, String> map = new TreeMap<>();
             LocalDateTime currentDate = LocalDateTime.now();
             currentDate = currentDate.minusDays(controller.BLOCKED_DAYS);
+            int count = 0;
             for (Rack rack: controller.getModel().getRacks()){
                 Cell[][] cells = rack.getCells();
                 for (int i = 0; i < rack.getRow(); i++) {
@@ -292,6 +300,7 @@ public class ClientGUI extends JFrame{
                         if (cells[i][j].getPallets() != null && cells[i][j].isContainReference(material)) {
                             for (Pallet p : cells[i][j].getPallets()) {
                                 if (p.getMaterial().equals(material)) {
+                                    count++;
                                     LocalDateTime loadingDate = p.getLoadingDate();
                                     if (loadingDate.isBefore(currentDate)) {
                                         map.put(p, rack.getName() + "," + cells[i][j].getName());
@@ -302,7 +311,11 @@ public class ClientGUI extends JFrame{
                     }
                 }
             }
-
+            if (count < 1) {
+                JOptionPane.showMessageDialog(pnlMain,"На стеллажах останеться последний паллет с материалом " + material, "ВНИМАНИЕ!",JOptionPane.INFORMATION_MESSAGE);
+                String event = String.format("Пользователь %s, предупрежден о том что остается последний паллет c материалом %s на стеллажах",activeUser,material);
+                controller.sendMessage(MessageType.EVENT,controller.events.get("WARN") + "-_-" + event);
+            }
             if (!map.isEmpty()) {
                 Pallet pallet = map.firstKey();
                 String s = map.get(pallet);
@@ -312,12 +325,13 @@ public class ClientGUI extends JFrame{
                 for (Rack r : controller.getModel().getRacks()){
                     if (r.getName().equals(rackString)){
                         rack = r;
+                        break;
                     }
                 }
                 Cell cell = rack.getCellByName(cellString);
                 if (rackString.equals(lblTableName.getText())) {
                     int col = cell.getCol();
-                    int row = mainTable.getRowCount() - cell.getRow();
+                    int row = cell.getRow();
                     String valueAt = (String) mainTable.getValueAt(row, col);
                     DataBuilder data = new DataBuilder();
                     data.fillValues(valueAt);
@@ -555,6 +569,8 @@ public class ClientGUI extends JFrame{
                                          break;
                                      //"Удалить пользователя"
                                     case 6:
+                                        ImportDataCells importDataCells = new ImportDataCells();
+                                        importDataCells.initView(controller);
                                         break;
                                     case 8:
                                         ImportData importData = new ImportData();
@@ -704,10 +720,27 @@ public class ClientGUI extends JFrame{
             cmbRackName.addItem(s);
         }
     }
-
+    public void refreshLog(){
+        txtaLog.setText("");
+        TreeMap<LocalDateTime, String> log = controller.getLog();
+        for (LocalDateTime dateTime: log.keySet()){
+            if (dateTime.isAfter(LocalDateTime.now().minusDays(7))) {
+                DateTimeFormatter f = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
+                dateTime.format(f);
+                String mes = dateTime.format(f) + " : " + log.get(dateTime) + "\n";
+                try {
+                    txtaLog.getDocument().insertString(0, mes, null);
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
+            }
+         //   txtaLog.append(dateTime + " : " + log.get(dateTime) + "\n");
+        }
+    }
     public void refreshView() {
         refreshRackList();
         refreshRack();
+        refreshLog();
     }
 
     private class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {

@@ -76,7 +76,7 @@ public class ImportData extends JFrame {
                         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
                         tblData.setModel(new DefaultTableModel(headers,0));
                         DefaultTableModel model = (DefaultTableModel) tblData.getModel();
-                        tblData.getColumn("#").setPreferredWidth(10);
+                        tblData.getColumn("#").setPreferredWidth(20);
                         tblData.getColumn("SAP Reference").setPreferredWidth(120);
                         tblData.getColumn("Size").setPreferredWidth(30);
                         tblData.getColumn("Description").setPreferredWidth(200);

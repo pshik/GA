@@ -10,7 +10,8 @@ public enum  MessageType {
     RACK_UPDATE,
     CHECK_ACCESS,   // - проверка пароля
     REFERENCE_REQUEST,
-    CELL_UPDATE,
+    LOG_REQUEST,
+    LOG_UPDATED,
     REFERENCE_UPDATE,
     LOAD_PALLET,      // - размещение паллета
     GOODBYE,
@@ -21,7 +22,7 @@ public enum  MessageType {
     CHANGE_RACK,
     CHANGE_REFERENCE,
     CHANGE_USER,
-    CHANGE_LINK_RACK_TO_REF,
     USERS_UPDATE,
-    IMPORT_EXPORT
+    IMPORT_EXPORT,
+    EVENT
 }

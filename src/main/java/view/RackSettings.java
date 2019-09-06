@@ -73,7 +73,7 @@ public class RackSettings extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (racks.size() > 1) {
-                    sendData(controller,0);
+                    sendData(controller,0,true);
                 } else {
                     JOptionPane.showMessageDialog(null, "Не рекомендуется удалять последний стеллаж!");
                 }
@@ -92,7 +92,7 @@ public class RackSettings extends JFrame{
                             }
                         }
                         if (isRackExist) {
-                            sendData(controller,1);
+                            sendData(controller,1,false);
                         } else {
                             JOptionPane.showMessageDialog(null, "Стеллажа " + fTxtRackName.getText() + " не существует. Если хотите создать новый стеллаж, используйте кнопку создать.");
                         }
@@ -115,7 +115,7 @@ public class RackSettings extends JFrame{
                             }
                         }
                         if (!isRackExist) {
-                           sendData(controller,1);
+                           sendData(controller,1,true);
                         } else {
                             JOptionPane.showMessageDialog(null, "Стеллаж " + fTxtRackName.getText() + " уже существует. Если хотите изменить данные используйте кнопку обновить.");
                         }
@@ -227,7 +227,7 @@ public class RackSettings extends JFrame{
         }
     }
 
-    private void sendData(ClientGuiController controller,int action){
+    private void sendData(ClientGuiController controller,int action,boolean isNew){
         Rack tmpRack = new Rack(fTxtRackName.getText(), Integer.parseInt(fTxtRowsNum.getText()), Integer.parseInt(fTxtColumnNum.getText()),null);
 
 
@@ -243,16 +243,16 @@ public class RackSettings extends JFrame{
         for (CheckListItem o: selectedReferencesList){
             refString = refString + o.toString() + ",";
         }
-
-        ListModel cellsModel = lstCells.getModel();
-        for (int i = 0; i < cellsModel.getSize(); i++){
-            CheckListItem element = (CheckListItem) cellsModel.getElementAt(i);
-            if (element.isSelected()){
-                Cell tmpCell = tmpRack.getCellByName(element.toString());
-                tmpCell.setBlocked(true);
+        if(!isNew) {
+            ListModel cellsModel = lstCells.getModel();
+            for (int i = 0; i < cellsModel.getSize(); i++) {
+                CheckListItem element = (CheckListItem) cellsModel.getElementAt(i);
+                if (element.isSelected()) {
+                    Cell tmpCell = tmpRack.getCellByName(element.toString());
+                    tmpCell.setBlocked(true);
+                }
             }
         }
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectMapper mapper = new ObjectMapper();
         try {

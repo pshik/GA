@@ -1314,3 +1314,182 @@
 2019-08-20 11:28:53,059 SECURITY  [Thread-10] - User admin login
 2019-08-20 11:29:07,621 SECURITY  [Thread-11] - User admin login
 2019-08-20 11:29:35,796 SECURITY  [Thread-12] - User admin login
+2019-08-22 15:05:47,718 DEBUG  [main] - Server is running!
+2019-08-22 15:05:54,982 SECURITY  [Thread-2] - User admin login
+2019-08-22 15:06:34,336 SECURITY  [Thread-3] - User admin login
+2019-08-22 15:07:50,530 DEBUG  [main] - Server is running!
+2019-08-22 15:07:56,896 SECURITY  [Thread-2] - User admin login
+2019-08-22 15:17:32,898 DEBUG  [main] - Server is running!
+2019-08-22 15:17:37,180 SECURITY  [Thread-2] - User admin login
+2019-08-22 15:29:44,909 DEBUG  [main] - Server is running!
+2019-08-22 15:30:01,042 SECURITY  [Thread-2] - User admin login
+2019-08-22 15:30:56,860 DEBUG  [main] - Server is running!
+2019-08-22 15:30:59,861 SECURITY  [Thread-2] - User admin login
+2019-08-22 15:37:01,197 DEBUG  [main] - Server is running!
+2019-08-22 15:37:06,347 SECURITY  [Thread-2] - User admin login
+2019-08-22 15:38:10,734 SECURITY  [Thread-3] - User admin login
+2019-08-22 15:38:40,701 SECURITY  [Thread-4] - User admin login
+2019-08-22 15:40:24,083 SECURITY  [Thread-5] - User admin login
+2019-08-22 15:44:09,118 SECURITY  [Thread-6] - User admin login
+2019-08-22 15:45:03,782 SECURITY  [Thread-7] - User admin login
+2019-08-22 15:52:18,168 SECURITY  [Thread-8] - User admin login
+2019-08-22 15:53:15,613 SECURITY  [Thread-9] - User admin login
+2019-08-22 15:56:40,733 SECURITY  [Thread-10] - User admin login
+2019-08-22 15:57:07,358 SECURITY  [Thread-11] - User admin login
+2019-08-22 15:57:47,253 SECURITY  [Thread-12] - User admin login
+2019-08-22 16:14:11,287 SECURITY  [Thread-13] - User admin login
+2019-08-22 16:14:25,144 SECURITY  [Thread-14] - User admin login
+2019-08-22 16:15:04,971 SECURITY  [Thread-15] - User admin login
+2019-08-22 16:15:41,571 SECURITY  [Thread-16] - User admin login
+2019-08-22 16:18:53,070 SECURITY  [Thread-17] - User admin login
+2019-08-22 16:19:05,872 SECURITY  [Thread-18] - User admin login
+2019-08-22 16:19:28,079 SECURITY  [Thread-19] - User admin login
+2019-08-22 16:27:30,937 SECURITY  [Thread-20] - User admin login
+2019-08-22 16:27:46,938 SECURITY  [Thread-21] - User admin login
+2019-08-22 16:29:55,933 DEBUG  [main] - Server is running!
+2019-08-22 16:29:58,774 SECURITY  [Thread-2] - User admin login
+2019-08-22 16:30:36,107 INFO  [Thread-2] - User admin: Load pallet. Rack-1 F1 122315332-001
+2019-08-22 16:30:48,747 SECURITY  [Thread-3] - User admin login
+2019-08-22 16:33:27,385 INFO  [Thread-3] - User admin: Load pallet. Rack-1 E3 122315332-001
+2019-08-22 16:35:24,332 DEBUG  [main] - Server is running!
+2019-08-22 16:35:30,997 SECURITY  [Thread-2] - User admin login
+2019-08-22 16:35:38,538 INFO  [Thread-2] - User admin: Load pallet. Rack-1 G1 122315332-001
+2019-08-22 16:36:13,293 SECURITY  [Thread-3] - User admin login
+2019-08-22 16:38:41,681 SECURITY  [Thread-4] - User admin login
+2019-08-22 16:38:47,401 INFO  [Thread-4] - User admin: Load pallet. Rack-1 G1 122315332-001
+2019-08-22 16:38:58,512 SECURITY  [Thread-5] - User admin login
+2019-08-22 16:39:04,519 INFO  [Thread-5] - User admin: Load pallet. Rack-1 C4 122315332-001
+2019-08-22 16:40:47,621 DEBUG  [main] - Server is running!
+2019-08-22 16:40:50,908 SECURITY  [Thread-2] - User admin login
+2019-08-22 16:41:05,376 INFO  [Thread-2] - User admin: Load pallet. Rack-1 F4 122315332-001
+2019-08-22 16:41:31,426 INFO  [Thread-2] - User admin: Load pallet. Rack-1 F3 122315332-001
+2019-08-22 16:42:43,497 DEBUG  [main] - Server is running!
+2019-08-22 16:42:57,176 SECURITY  [Thread-2] - User admin login
+2019-08-28 09:05:07,308 DEBUG  [main] - Server is running!
+2019-08-28 09:05:12,202 SECURITY  [Thread-2] - User admin login
+2019-08-28 09:07:38,154 INFO  [Thread-2] - User admin: change rack: Rack-L1
+2019-08-28 09:07:49,063 INFO  [Thread-2] - User admin: change rack: Rack-L2
+2019-08-28 09:08:15,398 INFO  [Thread-2] - User admin: change rack: Rack-L3
+2019-08-28 09:15:47,772 DEBUG  [main] - Server is running!
+2019-08-28 09:15:56,220 SECURITY  [Thread-2] - User admin login
+2019-08-28 09:16:11,560 INFO  [Thread-2] - User admin: delete reference: 122315123-002
+2019-08-28 09:16:13,799 INFO  [Thread-2] - User admin: delete reference: 122315331-002
+2019-08-28 09:16:15,519 INFO  [Thread-2] - User admin: delete reference: 122315332-001
+2019-08-28 09:16:17,264 INFO  [Thread-2] - User admin: delete reference: 122315333-002
+2019-08-28 09:16:26,072 INFO  [Thread-2] - User admin: create reference: Null
+2019-08-28 09:16:28,985 INFO  [Thread-2] - User admin: delete reference: 122315334-004
+2019-08-28 09:16:30,952 INFO  [Thread-2] - User admin: delete reference: 122315335-003
+2019-08-28 09:16:32,475 INFO  [Thread-2] - User admin: delete reference: 122315336-002
+2019-08-28 09:16:34,993 INFO  [Thread-2] - User admin: delete reference: 21331325323
+2019-08-28 09:18:39,066 INFO  [Thread-2] - User admin: delete reference: Null
+2019-08-28 09:21:25,234 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 G1 
+2019-08-28 09:21:26,770 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 G1 
+2019-08-28 09:21:28,264 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 F1 
+2019-08-28 09:21:30,270 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 F3 
+2019-08-28 09:21:41,787 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D1 
+2019-08-28 09:21:46,863 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 C1 
+2019-08-28 09:21:48,506 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-28 09:21:54,653 SECURITY  [Thread-3] - User admin login
+2019-08-28 09:22:38,516 INFO  [Thread-3] - User admin: change rack: Rack-1
+2019-08-28 09:22:46,843 INFO  [Thread-3] - User admin: change rack: Rack-1
+2019-08-28 14:30:56,473 DEBUG  [main] - Server is running!
+2019-08-28 14:31:04,380 SECURITY  [Thread-2] - User admin login
+2019-08-28 14:31:30,671 INFO  [Thread-2] - User admin: Load pallet. Rack-1 C5 114000120-09
+2019-08-28 14:31:44,410 INFO  [Thread-2] - User admin: Load pallet. Rack-1 E3 114000120-09
+2019-08-28 14:31:53,645 INFO  [Thread-2] - User admin: Load pallet. Rack-1 E3 114000120-09
+2019-08-28 14:32:09,330 INFO  [Thread-2] - User admin: Load pallet. Rack-1 C2 114000120-09
+2019-08-28 14:33:21,003 SECURITY  [Thread-3] - User admin login
+2019-08-28 14:50:37,526 SECURITY  [Thread-4] - User admin login
+2019-08-28 14:50:44,828 INFO  [Thread-4] - User admin: PickUp pallet. Rack-1 C2 114000120-09
+2019-08-28 14:50:49,319 SECURITY  [Thread-5] - User admin login
+2019-08-28 14:52:36,726 SECURITY  [Thread-6] - User admin login
+2019-08-28 14:53:59,026 SECURITY  [Thread-7] - User admin login
+2019-08-28 16:45:39,065 DEBUG  [main] - Server is running!
+2019-08-28 16:46:27,835 SECURITY  [Thread-2] - User admin login
+2019-08-28 16:46:31,614 INFO  [Thread-2] - User admin: PickUp pallet. Rack-1 C5 114000120-09
+2019-08-28 16:46:37,531 INFO  [Thread-2] - User admin: PickUp pallet. Rack-1 E3 114000120-09
+2019-08-28 16:46:49,874 WARN  [Thread-2] - Пользователь admin, предупрежден о том что остается последний паллет c материалом 114000120-09 на стеллажах
+2019-08-29 11:11:56,885 DEBUG  [main] - Server is running!
+2019-08-29 11:12:01,330 SECURITY  [Thread-2] - User admin login
+2019-08-29 11:12:07,052 INFO  [Thread-2] - User admin: Load pallet. Rack-1 D2 114000120-09
+2019-08-29 11:12:08,599 INFO  [Thread-2] - User admin: Load pallet. Rack-1 C3 114000120-09
+2019-08-29 11:12:28,418 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-29 11:12:30,498 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 E3 
+2019-08-29 11:12:50,310 SECURITY  [Thread-3] - User admin login
+2019-08-29 11:14:22,206 INFO  [Thread-3] - User admin: Load pallet. Rack-1 E1 114000120-09
+2019-08-29 11:14:33,494 INFO  [Thread-3] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-29 15:54:58,681 DEBUG  [main] - Server is running!
+2019-08-29 15:55:02,408 SECURITY  [Thread-2] - User admin login
+2019-08-29 15:55:06,361 INFO  [Thread-2] - User admin: PickUp pallet. Rack-1 E1 114000120-09
+2019-08-29 15:55:10,483 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-29 16:02:09,329 DEBUG  [main] - Server is running!
+2019-08-29 16:02:12,655 SECURITY  [Thread-2] - User admin login
+2019-08-29 16:03:09,446 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-29 16:03:31,941 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-29 16:05:16,878 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-29 16:06:36,767 DEBUG  [main] - Server is running!
+2019-08-29 16:06:45,684 SECURITY  [Thread-2] - User admin login
+2019-08-29 16:07:21,926 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-29 16:08:19,648 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-29 16:10:06,644 SECURITY  [Thread-3] - User admin login
+2019-08-29 16:10:37,912 INFO  [Thread-3] - User admin: Force pickup pallet. Rack-1 D2 
+2019-08-29 16:10:43,736 SECURITY  [Thread-4] - User admin login
+2019-09-02 09:15:29,713 DEBUG  [main] - Server is running!
+2019-09-02 09:15:33,134 SECURITY  [Thread-2] - User admin login
+2019-09-02 09:15:48,604 SECURITY  [Thread-3] - User admin login
+2019-09-02 09:22:23,123 SECURITY  [Thread-4] - User admin login
+2019-09-02 09:22:45,200 SECURITY  [Thread-5] - User admin login
+2019-09-02 09:22:54,936 INFO  [Thread-5] - User admin: Force pickup pallet. Rack-1 E3 114000120-09
+2019-09-02 09:22:59,269 SECURITY  [Thread-6] - User admin login
+2019-09-02 09:23:01,783 INFO  [Thread-6] - User admin: Force pickup pallet. Rack-1 D2 114000120-09
+2019-09-02 09:23:05,211 SECURITY  [Thread-7] - User admin login
+2019-09-02 09:32:54,767 SECURITY  [Thread-8] - User admin login
+2019-09-02 09:34:10,904 DEBUG  [main] - Server is running!
+2019-09-02 09:34:15,146 SECURITY  [Thread-2] - User admin login
+2019-09-02 09:36:46,414 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 C3 114000120-09
+2019-09-02 09:38:59,664 DEBUG  [main] - Server is running!
+2019-09-02 09:39:03,087 SECURITY  [Thread-2] - User admin login
+2019-09-02 09:39:06,288 INFO  [Thread-2] - User admin: Load pallet. Rack-1 D2 114000120-09
+2019-09-02 09:39:08,577 INFO  [Thread-2] - User admin: Load pallet. Rack-1 C2 114000120-09
+2019-09-02 09:39:10,613 INFO  [Thread-2] - User admin: Load pallet. Rack-1 C1 114000120-09
+2019-09-02 09:39:14,360 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 114000120-09
+2019-09-02 09:39:16,335 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 C2 114000120-09
+2019-09-02 09:39:18,151 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 C1 114000120-09
+2019-09-02 09:39:21,985 INFO  [Thread-2] - User admin: Load pallet. Rack-1 D3 114000120-09
+2019-09-02 09:39:25,687 INFO  [Thread-2] - User admin: Load pallet. Rack-1 D2 114000120-09
+2019-09-02 09:39:30,266 INFO  [Thread-2] - User admin: Load pallet. Rack-1 D1 114000120-09
+2019-09-02 12:35:23,224 DEBUG  [main] - Server is running!
+2019-09-02 12:35:30,469 SECURITY  [Thread-2] - User admin login
+2019-09-02 12:35:33,578 INFO  [Thread-2] - User admin: Force pickup pallet. Rack-1 D2 114000120-09
+2019-09-06 12:47:59,031 DEBUG  [main] - Server is running!
+2019-09-06 12:48:05,376 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:00:28,377 SECURITY  [Thread-3] - User admin login
+2019-09-06 13:01:57,371 DEBUG  [main] - Server is running!
+2019-09-06 13:02:06,559 DEBUG  [main] - Server is running!
+2019-09-06 13:02:11,525 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:03:23,655 SECURITY  [Thread-3] - User admin login
+2019-09-06 13:04:03,626 DEBUG  [main] - Server is running!
+2019-09-06 13:04:08,694 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:08:40,446 DEBUG  [main] - Server is running!
+2019-09-06 13:09:31,879 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:13:11,014 DEBUG  [main] - Server is running!
+2019-09-06 13:13:14,106 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:17:29,662 DEBUG  [main] - Server is running!
+2019-09-06 13:17:32,558 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:19:46,626 DEBUG  [main] - Server is running!
+2019-09-06 13:19:49,295 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:21:17,753 DEBUG  [main] - Server is running!
+2019-09-06 13:21:20,843 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:22:29,303 DEBUG  [main] - Server is running!
+2019-09-06 13:22:37,721 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:37:03,795 DEBUG  [main] - Server is running!
+2019-09-06 13:37:09,937 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:39:33,096 SECURITY  [Thread-3] - User admin login
+2019-09-06 13:42:52,825 DEBUG  [main] - Server is running!
+2019-09-06 13:43:00,089 DEBUG  [main] - Server is running!
+2019-09-06 13:43:03,292 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:43:30,441 SECURITY  [Thread-3] - User admin login
+2019-09-06 13:44:53,280 DEBUG  [main] - Server is running!
+2019-09-06 13:44:56,765 SECURITY  [Thread-2] - User admin login
+2019-09-06 13:50:33,134 DEBUG  [main] - Server is running!
+2019-09-06 13:50:35,967 SECURITY  [Thread-2] - User admin login
