@@ -8,6 +8,7 @@ import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 import server.Message;
 import server.MessageType;
+import sun.awt.RequestFocusController;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -205,6 +206,7 @@ public class ClientGUI extends JFrame{
                 lblSelectedCell.setText("");
             }
         });
+
     }
 
     private void showAvailableCells(String reference, String rackName, int stage) {
@@ -311,12 +313,13 @@ public class ClientGUI extends JFrame{
                     }
                 }
             }
-            if (count < 1) {
-                JOptionPane.showMessageDialog(pnlMain,"На стеллажах останеться последний паллет с материалом " + material, "ВНИМАНИЕ!",JOptionPane.INFORMATION_MESSAGE);
-                String event = String.format("Пользователь %s, предупрежден о том что остается последний паллет c материалом %s на стеллажах",activeUser,material);
-                controller.sendMessage(MessageType.EVENT,controller.events.get("WARN") + "-_-" + event);
-            }
+
             if (!map.isEmpty()) {
+                if (count < 2) {
+                    JOptionPane.showMessageDialog(pnlMain,"На стеллажах останеться последний паллет с материалом " + material, "ВНИМАНИЕ!",JOptionPane.INFORMATION_MESSAGE);
+                    String event = String.format("Пользователь %s, предупрежден о том что остается последний паллет c материалом %s на стеллажах",activeUser,material);
+                    controller.sendMessage(MessageType.EVENT,controller.events.get("WARN") + "-_-" + event);
+                }
                 Pallet pallet = map.firstKey();
                 String s = map.get(pallet);
                 String rackString = s.split(",")[0];
@@ -379,8 +382,11 @@ public class ClientGUI extends JFrame{
                     }
                 }
             } else {
-                JOptionPane.showMessageDialog(pnlMain, "На стеллажах не найдено паллет с материалом " + material + ".\n" +
-                        "Или материал блокирован в соответствии с периодом блокировки " + controller.BLOCKED_DAYS + " суток.");
+                if ( count == 0){
+                    JOptionPane.showMessageDialog(pnlMain, "На стеллажах не найдено паллет с материалом " + material);
+                } else {
+                    JOptionPane.showMessageDialog(pnlMain, "Материал блокирован в соответствии с периодом блокировки " + controller.BLOCKED_DAYS + " суток.");
+                }
             }
         }
     }
@@ -458,11 +464,20 @@ public class ClientGUI extends JFrame{
                 name = o.getFirstName() + " " + o.getSecondName();
             }
         }
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel(name + " введите ваш пароль :");
+        JPasswordField pass = new JPasswordField(15);
+        panel.add(label);
+        panel.add(pass);
+        String[] options = new String[]{"OK", "Отмена"};
+        int option = JOptionPane.showOptionDialog(null, panel, "Ввод пароля",
+                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, pass);
+        String password ="";
+        if(option == 0) {
+            password = String.valueOf(pass.getPassword());
+        }
 
-        String password = JOptionPane.showInputDialog(
-                this,
-                name + " введите ваш пароль :",
-                "");
         if (validation(password,result.toString())){
             JOptionPane.showMessageDialog(this,"Добро пожаловать!");
             activeUser = result.toString();

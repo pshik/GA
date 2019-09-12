@@ -22,7 +22,7 @@ import java.util.*;
 
 public class ClientGuiController {
     public int BLOCKED_DAYS = 0;
-    public String MESSAGE_DELIMITER = "-_-";
+    private final String MESSAGE_DELIMITER = "-_-";
     private static int logDays = 3;
     private static int serverPort;
     private static String serverAddress;
@@ -130,16 +130,14 @@ public class ClientGuiController {
 
 
         public void run(){
-
             try {
-                boolean isConnected = false;
-
                 Socket socket = new Socket(serverAddress, serverPort);
                 connection = new Connection(socket);
                 clientHandshake();
                 clientStartWorkplace();
                 clientLoop();
             } catch (IOException | ClassNotFoundException e) {
+             //   e.printStackTrace();
                 System.out.println("Server not available!");
                 view.serverStatus();
                 reload();

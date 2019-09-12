@@ -37,8 +37,13 @@ public class Connection implements Closeable {
     }
 
     public void close() throws IOException{
-        out.close();
-        in.close();
-        socket.close();
+        System.out.println(socket.isClosed());
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(socket.isClosed());
     }
+
 }

@@ -378,6 +378,11 @@ public class ServerController {
                     String reference = data[1];
                     String rackName = data[0];
                     String dateLoaded = data[2];
+                    if(dateLoaded.split(":").length == 2){
+                        dateLoaded = dateLoaded + ":00";
+                    }
+//                    DateTimeFormatter form = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+//                    dateForLoading = LocalDateTime.parse(dateLoaded,form);
                     loadPalletToRack(userName,cellPath,reference,rackName,dateLoaded);
                 }
                 isCorrect = true;

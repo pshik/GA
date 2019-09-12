@@ -225,7 +225,7 @@ public class Server {
                     case IMPORT_EXPORT:
                         data = m.getData();
                         action = Integer.parseInt(data.substring(0,1));
-                        reader = new StringReader(data.substring(1).split("-_-")[0]);
+                        reader = new StringReader(data.substring(1));
                         Object[] list = mapper.readValue(reader,Object[].class);
                         isCorrect = serverController.importExport(userName,action,list);
                         if (isCorrect){
