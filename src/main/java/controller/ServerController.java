@@ -5,6 +5,8 @@ import log.Event;
 import log.LogParser;
 import log.LoggerFiFo;
 import model.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +28,7 @@ public class ServerController {
         connectedUser.add(user);
     }
 
+    @Contract(pure = true)
     public static ServerController getServerController() {
         return serverController;
     }
@@ -56,7 +59,7 @@ public class ServerController {
     public void printLog(){
       //  System.out.println(logger.);
     }
-    public synchronized boolean loadPalletToRack(String currentUser, String cellFulPath, String refName, String lblTableName, String manualDate){
+    public synchronized boolean loadPalletToRack(String currentUser, String cellFulPath, String refName, String lblTableName, @NotNull String manualDate){
         boolean isCorrect = false;
         Rack tmpRack = (Rack) racks.get(lblTableName);
         SAPReference material = (SAPReference) references.get(refName);
@@ -154,7 +157,7 @@ public class ServerController {
         }
         return isCorrect;
     }
-    public synchronized boolean pickupPallet(String currentUser, String cellFulPath, String refName, String lblTableName){
+    public synchronized boolean pickupPallet(String currentUser, @NotNull String cellFulPath, String refName, String lblTableName){
         boolean isCorrect = false;
 
         ConcurrentMap tmp = base.getBase("Racks");
@@ -169,11 +172,14 @@ public class ServerController {
                     if (pallet.getPosition() == pos){
                         if(pallet.getMaterial().equals(refName)){
                             cell.pickUpPallet(pos,refName);
+                            isExist = true;
+                            break;
+                        } else {
                             isExist = false;
                         }
                     }
                 }
-            if (isExist){
+            if (!isExist){
                 System.out.println("Ячейка не содержит нужный вам материал.");
             } else {
                 tmpRack.setCellByAddress(cell.getRow(),cell.getCol(),cell);

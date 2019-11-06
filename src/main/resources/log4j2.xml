@@ -5,7 +5,7 @@
     </CustomLevels>
     <Appenders>
 
-        <File name="MyFile" fileName="src\main\resources\logs\output.log">
+        <File name="MyFile" fileName="C\logs\WMS\output.log">
             <PatternLayout>
                 <Pattern>%d %p %c{1.} [%t] - %m%n</Pattern>
             </PatternLayout>

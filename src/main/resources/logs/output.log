@@ -1728,3 +1728,33 @@
 2019-09-12 11:28:47,607 INFO  [Thread-2] - User admin: Load pallet. Rack-3 G3 163047870
 2019-09-12 11:28:47,655 INFO  [Thread-2] - User admin: Load pallet. Rack-3 G3 163047840
 2019-09-12 11:29:02,990 SECURITY  [Thread-3] - User admin login
+2019-09-12 13:45:52,554 DEBUG  [main] - Server is running!
+2019-09-12 13:45:57,740 SECURITY  [Thread-2] - User admin login
+2019-09-12 13:56:41,089 SECURITY  [Thread-4] - User admin login
+2019-09-12 13:56:48,785 INFO  [Thread-4] - User admin: Force pickup pallet. Rack-2 D2 100025610
+2019-09-12 13:57:12,959 SECURITY  [Thread-5] - User admin login
+2019-09-12 13:58:05,575 SECURITY  [Thread-6] - User admin login
+2019-09-12 14:00:39,366 SECURITY  [Thread-7] - User admin login
+2019-09-12 14:01:28,894 DEBUG  [main] - Server is running!
+2019-09-12 14:01:34,161 SECURITY  [Thread-2] - User admin login
+2019-09-12 14:02:56,611 SECURITY  [Thread-3] - User admin login
+2019-09-12 14:04:30,293 DEBUG  [main] - Server is running!
+2019-09-12 14:04:35,646 SECURITY  [Thread-2] - User admin login
+2019-09-12 14:04:47,827 SECURITY  [Thread-3] - User admin login
+2019-09-12 14:24:15,471 INFO  [Thread-3] - User admin: Force pickup pallet. Rack-2 E1 
+2019-09-12 14:24:21,157 INFO  [Thread-3] - User admin: Force pickup pallet. Rack-2 E1 102100290
+2019-09-12 14:24:29,377 INFO  [Thread-3] - User admin: Force pickup pallet. Rack-2 E1 100025610
+2019-09-12 14:25:07,276 DEBUG  [main] - Server is running!
+2019-09-12 14:25:11,873 SECURITY  [Thread-2] - User admin login
+2019-09-13 09:46:22,564 DEBUG  [main] - Server is running!
+2019-09-13 09:46:28,497 SECURITY  [Thread-2] - User admin login
+2019-09-13 09:46:41,539 INFO  [Thread-2] - User admin: change rack: Rack-1
+2019-09-13 09:46:45,992 INFO  [Thread-2] - User admin: change rack: Rack-1
+2019-09-13 09:46:53,028 INFO  [Thread-2] - User admin: change rack: Rack-2
+2019-09-13 09:46:59,817 INFO  [Thread-2] - User admin: change rack: Rack-2
+2019-09-13 09:47:04,831 INFO  [Thread-2] - User admin: change rack: Rack-3
+2019-09-13 09:47:08,623 INFO  [Thread-2] - User admin: change rack: Rack-3
+2019-09-13 09:52:04,421 INFO  [Thread-2] - User admin: create user: dilya.galimova
+2019-09-13 09:52:37,011 INFO  [Thread-2] - User admin: create user: dmitriy.suslennikov
+2019-09-13 09:53:25,020 INFO  [Thread-2] - User admin: create user: alexander.bush
+2019-09-13 09:55:49,281 INFO  [Thread-2] - User admin: create user: driver1

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import exceptions.CloseWindow;
 import model.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import server.Connection;
 import server.Message;
 import server.MessageType;
@@ -27,8 +29,21 @@ public class ClientGuiController {
     private static int serverPort;
     private static String serverAddress;
 
-    private static TreeMap<Integer,String> listOfManagersCommands = new TreeMap<>();
-
+//    private static TreeMap<Integer,String> listOfManagersCommands = new TreeMap<>();
+//    static {
+//        //  listOfManagersCommands.put(1,"Создать стеллаж");
+//        // listOfManagersCommands.put(2,"Удалить стеллаж");
+//        listOfManagersCommands.put(3,"Управление материалами");
+//        listOfManagersCommands.put(4,"Управление стеллажами");
+//        listOfManagersCommands.put(5,"Управление пользователями");
+//        listOfManagersCommands.put(6,"Загрузить из .CSV палеты");
+//        //  listOfManagersCommands.put(7,"Отчеты");
+//        listOfManagersCommands.put(8,"Загрузить материалы из .CSV");
+//        //  listOfManagersCommands.put(9,"Привязать материалы к стеллажу");
+//    }
+//    public TreeMap<Integer, String> getListOfManagersCommands() {
+//        return listOfManagersCommands;
+//    }
     private Connection connection;
     private volatile boolean clientConnected = false;
     private String currentUser;
@@ -50,17 +65,7 @@ public class ClientGuiController {
         put("WARN", "WARN");
         put("ERROR", "ERROR");
     }};
-    static {
-      //  listOfManagersCommands.put(1,"Создать стеллаж");
-       // listOfManagersCommands.put(2,"Удалить стеллаж");
-        listOfManagersCommands.put(3,"Управление материалами");
-        listOfManagersCommands.put(4,"Управление стеллажами");
-        listOfManagersCommands.put(5,"Управление пользователями");
-        listOfManagersCommands.put(6,"Загрузить из .CSV палеты");
-      //  listOfManagersCommands.put(7,"Отчеты");
-        listOfManagersCommands.put(8,"Загрузить материалы из .CSV");
-      //  listOfManagersCommands.put(9,"Привязать материалы к стеллажу");
-    }
+
 
     public String getCurrentUser() {
         return currentUser;
@@ -68,9 +73,7 @@ public class ClientGuiController {
     public Connection getConnection() {
         return connection;
     }
-    public TreeMap<Integer, String> getListOfManagersCommands() {
-        return listOfManagersCommands;
-    }
+
 
     public int getLogDays() {
         return logDays;
@@ -232,7 +235,7 @@ public class ClientGuiController {
                 }
         }
 
-        private void getBase(Message message) throws IOException {
+        private void getBase(@NotNull Message message) throws IOException {
             String data = message.getData();
             StringReader reader = new StringReader(data);
             ObjectMapper mapper = new ObjectMapper();
@@ -300,6 +303,8 @@ public class ClientGuiController {
 
 
 
+    @NotNull
+    @Contract(" -> new")
     private Thread getSocketThread() {
         return new GuiSocketThread();
     }
@@ -325,7 +330,7 @@ public class ClientGuiController {
         }
     }
 
-    private void updateLog(Message message) {
+    private void updateLog(@NotNull Message message) {
         String data = message.getData();
         StringReader reader = new StringReader(data);
         ObjectMapper mapper = new ObjectMapper();
@@ -348,7 +353,7 @@ public class ClientGuiController {
         FileInputStream fileServerProperties ;
 
         try {
-            fileServerProperties = new FileInputStream("src/main/resources/client.properties");
+            fileServerProperties = new FileInputStream(args[0]);
             properties.load(fileServerProperties);
             serverAddress = properties.getProperty("server.ip");
             serverPort = Integer.parseInt(properties.getProperty("server.port"));

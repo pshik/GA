@@ -84,7 +84,7 @@ public class Cell implements Serializable,Comparable<Cell> {
         for (Pallet p : tmp) {
             if (p != null && p.getMaterial().equals(pallet) && p.getPosition() == position) {
                 pallets.remove(p);
-                System.out.println(";");
+               // System.out.println(";");
             }
         }
         if (pallets.size() == 0) pallets.add(null);

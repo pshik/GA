@@ -41,7 +41,7 @@ public class Server {
         FileInputStream fileServerProperties ;
 
         try {
-            fileServerProperties = new FileInputStream("src/main/resources/server.properties");
+            fileServerProperties = new FileInputStream(args[0]);
             properties.load(fileServerProperties);
             pathToBase = properties.getProperty("db.path");
             port = Integer.parseInt(properties.getProperty("server.port"));

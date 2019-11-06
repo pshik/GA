@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -16,10 +17,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class ImportDataCells extends JFrame {
     private JButton btnBrowse;
-    private JTable tblData ;
+    private JTable tblData;
     private JScrollPane scrTable;
     private JPanel pnlTable;
     private JPanel pnlPath;
@@ -32,10 +34,10 @@ public class ImportDataCells extends JFrame {
     public ImportDataCells() {
         setTitle("Настройка стеллажей");
         setVisible(false);
-      //  setUndecorated(true);
+        setUndecorated(true);
         getRootPane().setWindowDecorationStyle(JRootPane.NONE);
-        setLocation(200,200);
-        // setAlwaysOnTop(true);
+        setLocation(200, 200);
+        //   setAlwaysOnTop(true);
         setContentPane(pnlMain);
         fc.setAcceptAllFileFilterUsed(false);
         fc.addChoosableFileFilter(new FileFilter() {
@@ -56,7 +58,7 @@ public class ImportDataCells extends JFrame {
 
     }
 
-    public void initView(ClientGuiController controller){
+    public void initView(ClientGuiController controller) {
 
         btnBrowse.addActionListener(new ActionListener() {
             @Override
@@ -74,39 +76,39 @@ public class ImportDataCells extends JFrame {
                                 records.add(values);
                             }
                         }
-                        Object[] headers = new Object[]{"#","Rack Name","Reference","Date","Cell","Volume"};
+                        Object[] headers = new Object[]{"#", "Rack Name", "Reference", "Date", "Cell", "Position"};
                         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
                         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-                        tblData.setModel(new DefaultTableModel(headers,0));
+                        tblData.setModel(new DefaultTableModel(headers, 0));
                         DefaultTableModel model = (DefaultTableModel) tblData.getModel();
                         tblData.getColumn("#").setPreferredWidth(50);
                         tblData.getColumn("Rack Name").setPreferredWidth(100);
                         tblData.getColumn("Reference").setPreferredWidth(200);
                         tblData.getColumn("Date").setPreferredWidth(160);
                         tblData.getColumn("Cell").setPreferredWidth(80);
-                        tblData.getColumn("Volume").setPreferredWidth(80);
+                        tblData.getColumn("Position").setPreferredWidth(80);
                         tblData.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
                         tblData.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-                        for (int i=0; i < records.size(); i++){
-                            if (records.get(i).length == 5){
-                                model.addRow(new Object[]{i+1,records.get(i)[0], records.get(i)[1], records.get(i)[2],records.get(i)[3],records.get(i)[4]});
-                               // System.out.println(records.get(i)[0] + " : " +records.get(i)[1]+ " : " +records.get(i)[2]+ " : " + records.get(i)[3]);
-                            } else if (records.get(i).length > 5){
-                                model.addRow(new Object[]{i+1,records.get(i)[0], records.get(i)[1], records.get(i)[2],records.get(i)[3],records.get(i)[4]});
+                        for (int i = 0; i < records.size(); i++) {
+                            if (records.get(i).length == 7) {
+                                model.addRow(new Object[]{i + 1, records.get(i)[0], records.get(i)[1], records.get(i)[2], records.get(i)[3], records.get(i)[6]});
+                                // System.out.println(records.get(i)[0] + " : " +records.get(i)[1]+ " : " +records.get(i)[2]+ " : " + records.get(i)[3]);
+                            } else if (records.get(i).length > 7) {
+                                model.addRow(new Object[]{i + 1, records.get(i)[0], records.get(i)[1], records.get(i)[2], records.get(i)[3], records.get(i)[6]});
                                 txtaStatus.append("Error in line:" + i + "\n");
                             } else {
-                                switch (records.get(i).length){
+                                switch (records.get(i).length) {
                                     case 1:
-                                        model.addRow(new Object[]{i+1,records.get(i)[0],"", "","",""});
+                                        model.addRow(new Object[]{i + 1, records.get(i)[0], "", "", "", ""});
                                         break;
                                     case 2:
-                                        model.addRow(new Object[]{i+1,records.get(i)[0],records.get(i)[1], "","",""});
+                                        model.addRow(new Object[]{i + 1, records.get(i)[0], records.get(i)[1], "", "", ""});
                                         break;
                                     case 3:
-                                        model.addRow(new Object[]{i+1,records.get(i)[0],records.get(i)[1], records.get(i)[2],"",""});
+                                        model.addRow(new Object[]{i + 1, records.get(i)[0], records.get(i)[1], records.get(i)[2], "", ""});
                                         break;
                                 }
-                                txtaStatus.append("Ошибка в процессе обработки файла. Строка : " + (i+1) + "\n");
+                                txtaStatus.append("Ошибка в процессе обработки файла. Строка : " + (i + 1) + "\n");
                             }
                         }
                     } catch (IOException ex) {
@@ -121,20 +123,19 @@ public class ImportDataCells extends JFrame {
                 boolean isDataCorrect = true;
                 DefaultTableModel model = (DefaultTableModel) tblData.getModel();
                 ArrayList<Object> list = new ArrayList<>();
-                for (int i = 0; i < model.getRowCount(); i++){
+                for (int i = 0; i < model.getRowCount(); i++) {
                     try {
                         String rackName = (String) model.getValueAt(i, 1);
                         String reference = (String) model.getValueAt(i, 2);
                         String dateString = (String) model.getValueAt(i, 3);
                         String cellAddress = (String) model.getValueAt(i, 4);
-                        int volume = Integer.parseInt((String) model.getValueAt(i, 5));
                         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
                         String yyyy;
                         String MMM;
                         String dd;
                         String time = dateString.substring(dateString.indexOf(" "));
-                        if (dateString.contains(".")){
+                        if (dateString.contains(".")) {
                             dd = dateString.split("\\.")[1];
                             MMM = dateString.split("\\.")[0];
                             yyyy = dateString.split("\\.")[2].split(" ")[0];
@@ -143,80 +144,37 @@ public class ImportDataCells extends JFrame {
                             MMM = dateString.split("/")[1];
                             yyyy = dateString.split("/")[2].split(" ")[0];
                         }
-                        if (time.split(":").length <= 2){
+                        if (time.split(":").length <= 2) {
                             time = time + ":00";
                         }
                         String HH = time.split(":")[0].trim();
                         String mm = time.split(":")[1];
                         String ss = time.split(":")[2];
-                        if (HH.length()<2){
-                            HH=0+HH;
+                        if (HH.length() < 2) {
+                            HH = 0 + HH;
                         }
-                        if (mm.length()<2){
-                            mm=0+HH;
+                        if (mm.length() < 2) {
+                            mm = 0 + HH;
                         }
                         time = " " + HH + ":" + mm + ":" + ss;
                         String resultDate = dd + "/" + MMM + "/" + yyyy + time;
 
-                       // LocalDateTime dateForLoading ;
+                        // LocalDateTime dateForLoading ;
 //                        DateTimeFormatter form = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 //                        dateForLoading = LocalDateTime.parse(resultDate,form);
                         String cell = cellAddress.split("-")[0];
-                        String position = "0";
-                        String[] tmp = cellAddress.split("-");
-                        if (tmp.length == 3){
-                            switch (tmp[1]){
-                                case "2":
-                                    position = tmp[2];
-                                    break;
-                                case "3":
-                                    switch (tmp[2]){
-                                        case "1":
-                                            position = "3";
-                                            break;
-                                        case "2":
-                                            position = "4";
-                                            break;
-                                        case "3":
-                                            position = "5";
-                                            break;
-                                    }
-                                    break;
-                            }
-                        } else if(tmp.length == 2){
-                            switch (volume){
-                                case 1:
-                                    switch (tmp[1]){
-                                        case "1":
-                                            position = "3";
-                                            break;
-                                        case "2":
-                                            position = "4";
-                                            break;
-                                        case "3":
-                                            position = "5";
-                                            break;
-                                    }
-                                    break;
-                                case 2:
-                                    position = tmp[2];
-                                    break;
-                                case 3:
-                                    position = "0";
-                                    break;
-                            }
-                        }
+                        String position = (String) model.getValueAt(i, 5);
                         String str = rackName + " | " + reference + " | " + resultDate + " | " + cell + "[" + position + "]";
                         if (!rackName.trim().isEmpty() && !reference.isEmpty() && !dateString.trim().isEmpty() && !cellAddress.isEmpty()) {
                             String newLine = rackName + controller.getMESSAGE_DELIMITER() + reference + controller.getMESSAGE_DELIMITER() + resultDate + controller.getMESSAGE_DELIMITER() + cell + "[" + position + "]";
                             list.add(newLine);
                         } else {
                             isDataCorrect = false;
-                            JOptionPane.showMessageDialog(pnlMain,"Проверьте корректность данных в строке " + (i+1));
+                            JOptionPane.showMessageDialog(pnlMain, "Проверьте корректность данных в строке " + (i + 1));
                         }
                         System.out.println(str);
-                    } catch (NumberFormatException eSize){
-                        JOptionPane.showMessageDialog(pnlMain,"Проверьте корректность данных в строке " + (i+1));
+                    } catch (NumberFormatException eSize) {
+                        JOptionPane.showMessageDialog(pnlMain, "Проверьте корректность данных в строке " + (i + 1));
                         isDataCorrect = false;
                     }
                 }
@@ -242,8 +200,87 @@ public class ImportDataCells extends JFrame {
         pack();
         setVisible(true);
     }
+
     public static void main(String[] args) {
         ImportDataCells importData = new ImportDataCells();
         importData.initView(null);
+    }
+
+    {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+        $$$setupUI$$$();
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        pnlMain = new JPanel();
+        pnlMain.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        pnlTable = new JPanel();
+        pnlTable.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(5, 5, 5, 5), -1, -1));
+        pnlMain.add(pnlTable, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        scrTable = new JScrollPane();
+        scrTable.setToolTipText("");
+        pnlTable.add(scrTable, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        scrTable.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), null));
+        tblData = new JTable();
+        scrTable.setViewportView(tblData);
+        final JScrollPane scrollPane1 = new JScrollPane();
+        pnlTable.add(scrollPane1, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(-1, 40), null, null, 0, false));
+        txtaStatus = new JTextArea();
+        scrollPane1.setViewportView(txtaStatus);
+        pnlPath = new JPanel();
+        pnlPath.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 3, new Insets(5, 20, 0, 5), -1, -1));
+        pnlMain.add(pnlPath, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        btnBrowse = new JButton();
+        this.$$$loadButtonText$$$(btnBrowse, ResourceBundle.getBundle("strings").getString("btn_Browse"));
+        pnlPath.add(btnBrowse, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        btnImport = new JButton();
+        this.$$$loadButtonText$$$(btnImport, ResourceBundle.getBundle("strings").getString("btn_Import"));
+        pnlPath.add(btnImport, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        btnExit = new JButton();
+        this.$$$loadButtonText$$$(btnExit, ResourceBundle.getBundle("strings").getString("btn_Exit"));
+        pnlPath.add(btnExit, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private void $$$loadButtonText$$$(AbstractButton component, String text) {
+        StringBuffer result = new StringBuffer();
+        boolean haveMnemonic = false;
+        char mnemonic = '\0';
+        int mnemonicIndex = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '&') {
+                i++;
+                if (i == text.length()) break;
+                if (!haveMnemonic && text.charAt(i) != '&') {
+                    haveMnemonic = true;
+                    mnemonic = text.charAt(i);
+                    mnemonicIndex = result.length();
+                }
+            }
+            result.append(text.charAt(i));
+        }
+        component.setText(result.toString());
+        if (haveMnemonic) {
+            component.setMnemonic(mnemonic);
+            component.setDisplayedMnemonicIndex(mnemonicIndex);
+        }
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return pnlMain;
     }
 }
