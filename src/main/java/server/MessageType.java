@@ -24,5 +24,6 @@ public enum  MessageType {
     CHANGE_USER,
     USERS_UPDATE,
     IMPORT_EXPORT,
-    EVENT
+    EVENT,
+    PALLET_UPDATE
 }

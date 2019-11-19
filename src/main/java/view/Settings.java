@@ -1,6 +1,8 @@
 package view;
 
 import com.google.common.graph.Network;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import controller.ClientGuiController;
 import org.apache.logging.log4j.core.appender.db.jpa.JpaAppender;
 
@@ -24,6 +26,7 @@ public class Settings extends JFrame {
     private JPanel pnlRadBut;
     private JPanel pnlButtons;
     private JPanel pnlMain;
+    private int currentCardLayout;
 
     public Settings() {
         setTitle("Настройки");
@@ -31,26 +34,27 @@ public class Settings extends JFrame {
         setUndecorated(true);
         getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         setLocation(200, 200);
+        setSize(400, 400);
         setAlwaysOnTop(true);
         setContentPane(pnlMain);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         rbNetwork.setSelected(true);
-
+        currentCardLayout = 0;
     }
 
-    private void initFrame(ClientGuiController controller) {
+    protected void initFrame(ClientGuiController controller) {
         JPanel cardNetwork = new JPanel();
         GridBagLayout gridBagLayout = new GridBagLayout();
         cardNetwork.setLayout(gridBagLayout);
         GridBagConstraints c = new GridBagConstraints();
-        JTextField ip = new JTextField("172.25.217.30");
+        JTextField ip = new JTextField(controller.getServerAddress());
         ip.setPreferredSize(new Dimension(100, 20));
         c.gridx = 1;
         c.gridy = 0;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.WEST;
         gridBagLayout.setConstraints(ip, c);
-        JTextField port = new JTextField("4040");
+        JTextField port = new JTextField(String.valueOf(controller.getServerPort()));
         port.setPreferredSize(new Dimension(100, 20));
         c.gridx = 1;
         c.gridy = 1;
@@ -69,7 +73,10 @@ public class Settings extends JFrame {
         cardNetwork.add(lblPort);
 
         JPanel cardBlockingDays = new JPanel();
-        JFormattedTextField txtBlock = new JFormattedTextField(4);
+        int blocked_days = controller.getBLOCKED_DAYS();
+        //   JFormattedTextField txtBlock = new JFormattedTextField(String.valueOf(blocked_days));
+        JFormattedTextField txtBlock = new JFormattedTextField();
+        txtBlock.setValue(blocked_days);
         NumberFormat integerFieldFormatter = NumberFormat.getIntegerInstance();
         integerFieldFormatter.setGroupingUsed(false);
         DefaultFormatterFactory formatterFactory = new DefaultFormatterFactory(new NumberFormatter());
@@ -94,8 +101,8 @@ public class Settings extends JFrame {
         btnExit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                controller.setBusy(false);
-//                controller.getView().refreshView();
+                controller.setBusy(false);
+                controller.getView().refreshView();
                 dispose();
             }
         });
@@ -104,6 +111,7 @@ public class Settings extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 CardLayout layout = (CardLayout) pnlSettings.getLayout();
                 layout.show(pnlSettings, rbNetwork.getText());
+                currentCardLayout = 0;
             }
         });
         rbBackUp.addActionListener(new ActionListener() {
@@ -111,6 +119,7 @@ public class Settings extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 CardLayout layout = (CardLayout) pnlSettings.getLayout();
                 layout.show(pnlSettings, rbBackUp.getText());
+                currentCardLayout = 1;
             }
         });
         rbHistory.addActionListener(new ActionListener() {
@@ -118,6 +127,7 @@ public class Settings extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 CardLayout layout = (CardLayout) pnlSettings.getLayout();
                 layout.show(pnlSettings, rbHistory.getText());
+                currentCardLayout = 2;
             }
         });
         rbBlockDays.addActionListener(new ActionListener() {
@@ -125,9 +135,32 @@ public class Settings extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 CardLayout layout = (CardLayout) pnlSettings.getLayout();
                 layout.show(pnlSettings, rbBlockDays.getText());
+                currentCardLayout = 3;
             }
         });
+        btnApply.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                switch (currentCardLayout) {
+                    case 0:
+                        String newIP = ip.getText();
+                        String newPort = port.getText();
+                        System.out.printf("new server IP is %s and new port is %s ", newIP, newPort);
+                        controller.updateProperties("server.ip", newIP);
+                        controller.updateProperties("server.port", newPort);
+                        break;
+                    case 1:
+                        //   break;
+                    case 2:
+                        controller.updateProperties("days.for.log", "5");
+                        break;
+                    case 3:
 
+                        break;
+
+                }
+            }
+        });
         pack();
         setVisible(true);
     }
@@ -153,35 +186,35 @@ public class Settings extends JFrame {
      */
     private void $$$setupUI$$$() {
         pnlMain = new JPanel();
-        pnlMain.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
+        pnlMain.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
         pnlRadBut = new JPanel();
-        pnlRadBut.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(4, 1, new Insets(5, 5, 5, 0), -1, -1));
-        pnlMain.add(pnlRadBut, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 2, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        pnlRadBut.setLayout(new GridLayoutManager(4, 1, new Insets(5, 5, 5, 0), -1, -1));
+        pnlMain.add(pnlRadBut, new GridConstraints(0, 0, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         rbNetwork = new JRadioButton();
         this.$$$loadButtonText$$$(rbNetwork, ResourceBundle.getBundle("strings").getString("rb_Settings"));
-        pnlRadBut.add(rbNetwork, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pnlRadBut.add(rbNetwork, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         rbBackUp = new JRadioButton();
         this.$$$loadButtonText$$$(rbBackUp, ResourceBundle.getBundle("strings").getString("rb_BackUp"));
-        pnlRadBut.add(rbBackUp, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pnlRadBut.add(rbBackUp, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         rbHistory = new JRadioButton();
         this.$$$loadButtonText$$$(rbHistory, ResourceBundle.getBundle("strings").getString("rb_History"));
-        pnlRadBut.add(rbHistory, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pnlRadBut.add(rbHistory, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         rbBlockDays = new JRadioButton();
         this.$$$loadButtonText$$$(rbBlockDays, ResourceBundle.getBundle("strings").getString("rb_Block"));
-        pnlRadBut.add(rbBlockDays, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pnlRadBut.add(rbBlockDays, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         pnlSettings = new JPanel();
         pnlSettings.setLayout(new CardLayout(0, 0));
-        pnlMain.add(pnlSettings, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        pnlMain.add(pnlSettings, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         pnlSettings.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
         pnlButtons = new JPanel();
-        pnlButtons.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 5, 5), -1, -1));
-        pnlMain.add(pnlButtons, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_SOUTH, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        pnlButtons.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 5, 5), -1, -1));
+        pnlMain.add(pnlButtons, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_SOUTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         btnExit = new JButton();
         this.$$$loadButtonText$$$(btnExit, ResourceBundle.getBundle("strings").getString("btn_Exit"));
-        pnlButtons.add(btnExit, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pnlButtons.add(btnExit, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         btnApply = new JButton();
         this.$$$loadButtonText$$$(btnApply, ResourceBundle.getBundle("strings").getString("btn_Apply"));
-        pnlButtons.add(btnApply, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pnlButtons.add(btnApply, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         ButtonGroup buttonGroup;
         buttonGroup = new ButtonGroup();
         buttonGroup.add(rbHistory);
@@ -223,4 +256,5 @@ public class Settings extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return pnlMain;
     }
+
 }

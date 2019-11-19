@@ -13,10 +13,7 @@ import model.SAPReference;
 import model.User;
 import org.apache.logging.log4j.Level;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
@@ -138,6 +135,7 @@ public class Server {
         private void serverMainLoop(Connection connection, String userName) throws IOException, ClassNotFoundException {
             boolean connectionActive = true;
             System.out.println("Успешный вход польхователя: " + userName + ". Используется соединение с удаленным адресом: " + socket.getRemoteSocketAddress());
+            ConcurrentMap racks;
             while (connectionActive){
                 Message m = connection.receive();
                 String data;
@@ -148,9 +146,14 @@ public class Server {
                 boolean isCorrect;
                 switch (m.getType()){
                     case RACK_UPDATE:
-                        ConcurrentMap racks = base.getBase("Racks");
+                        racks = base.getBase("Racks");
                         data = messageData(racks);
                         connection.send(new Message(MessageType.RACK_UPDATE, data));
+                        break;
+                    case PALLET_UPDATE:
+                        racks = base.getBase("Racks");
+                        data = messageData(racks);
+                        connection.send(new Message(MessageType.PALLET_UPDATE, data));
                         break;
                     case REFERENCE_REQUEST:
                         ConcurrentMap references = base.getBase("References");
@@ -180,14 +183,14 @@ public class Server {
                         data = m.getData();
                         isCorrect = serverController.loadPalletToRack(userName,data.split("-_-")[0],data.split("-_-")[1],data.split("-_-")[2],data.split("-_-")[3]);
                         if (isCorrect){
-                            broadcastMessage(MessageType.RACK_UPDATE);
+                            broadcastMessage(MessageType.PALLET_UPDATE);
                         }
                         break;
                     case PICKUP_PALLET:
                         data = m.getData();
                         isCorrect = serverController.pickupPallet(userName,data.split("-_-")[0],data.split("-_-")[1],data.split("-_-")[2]);
                         if (isCorrect){
-                            broadcastMessage(MessageType.RACK_UPDATE);
+                            broadcastMessage(MessageType.PALLET_UPDATE);
                         }
                         break;
                     case SETTINGS:
@@ -208,7 +211,7 @@ public class Server {
                         data = m.getData();
                         isCorrect = serverController.forcedPickUp(userName,data.split("-_-")[0],data.split("-_-")[1],data.split("-_-")[2]);
                         if (isCorrect){
-                            broadcastMessage(MessageType.RACK_UPDATE);
+                            broadcastMessage(MessageType.PALLET_UPDATE);
                         }
                         break;
                     case CHANGE_RACK:

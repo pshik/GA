@@ -15,6 +15,7 @@ import view.ClientGUI;
 
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.Socket;
@@ -28,22 +29,33 @@ public class ClientGuiController {
     private static int logDays = 3;
     private static int serverPort;
     private static String serverAddress;
+    private static Properties properties = new Properties();
+    private static String pathToProperties = "";
+    public int getBLOCKED_DAYS() {
+        return BLOCKED_DAYS;
+    }
 
-//    private static TreeMap<Integer,String> listOfManagersCommands = new TreeMap<>();
-//    static {
-//        //  listOfManagersCommands.put(1,"Создать стеллаж");
-//        // listOfManagersCommands.put(2,"Удалить стеллаж");
-//        listOfManagersCommands.put(3,"Управление материалами");
-//        listOfManagersCommands.put(4,"Управление стеллажами");
-//        listOfManagersCommands.put(5,"Управление пользователями");
-//        listOfManagersCommands.put(6,"Загрузить из .CSV палеты");
-//        //  listOfManagersCommands.put(7,"Отчеты");
-//        listOfManagersCommands.put(8,"Загрузить материалы из .CSV");
-//        //  listOfManagersCommands.put(9,"Привязать материалы к стеллажу");
-//    }
-//    public TreeMap<Integer, String> getListOfManagersCommands() {
-//        return listOfManagersCommands;
-//    }
+    public void setBLOCKED_DAYS(int BLOCKED_DAYS) {
+        this.BLOCKED_DAYS = BLOCKED_DAYS;
+    }
+
+    public  int getServerPort() {
+        return serverPort;
+    }
+
+    public  void setServerPort(int serverPort) {
+        ClientGuiController.serverPort = serverPort;
+    }
+
+    public  String getServerAddress() {
+        return serverAddress;
+    }
+
+    public  void setServerAddress(String serverAddress) {
+        ClientGuiController.serverAddress = serverAddress;
+    }
+
+
     private Connection connection;
     private volatile boolean clientConnected = false;
     private String currentUser;
@@ -127,6 +139,17 @@ public class ClientGuiController {
         return false;
     }
 
+    public void updateProperties(String key, String value) {
+
+        FileOutputStream fileServerProperties ;
+        properties.setProperty(key,value);
+        try {
+            fileServerProperties = new FileOutputStream(pathToProperties);
+            properties.store(fileServerProperties,"Updated by " + currentUser);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     class GuiSocketThread extends Thread{
@@ -141,7 +164,8 @@ public class ClientGuiController {
                 clientLoop();
             } catch (IOException | ClassNotFoundException e) {
              //   e.printStackTrace();
-                System.out.println("Server not available!");
+            //   System.out.println("Server not available!");
+                reloadProperties();
                 view.serverStatus();
                 reload();
             }  catch (Exception e) {
@@ -185,6 +209,20 @@ public class ClientGuiController {
                                 if (!isBusy) {
                                     view.refreshRack();
                                 }
+                                break;
+                            case PALLET_UPDATE:
+                                connection.send(new Message((MessageType.PALLET_UPDATE)));
+                                message = connection.receive();
+                                if (message.getType() == MessageType.PALLET_UPDATE){
+                                    getBase(message);
+                                    model.updateRack(racks);
+                                }
+                                if (!isBusy) {
+                                    view.refreshRack();
+                                }
+//                                if (!isBusy) {
+//                                    view.refreshRackList();
+//                                }
                                 break;
                             case USERS_UPDATE:
                                 connection.send(new Message(MessageType.USER_REQUEST));
@@ -247,6 +285,7 @@ public class ClientGuiController {
                         references.clear();
                     references.addAll(Arrays.asList(s));
                     break;
+                case PALLET_UPDATE:
                 case RACK_UPDATE:
                     Rack[] r = mapper.readValue(reader, Rack[].class);
                     if(!racks.isEmpty())
@@ -300,7 +339,18 @@ public class ClientGuiController {
         }
     }
 
-
+    private void reloadProperties() {
+        FileInputStream fileServerProperties ;
+        try {
+            fileServerProperties = new FileInputStream(pathToProperties);
+            properties.load(fileServerProperties);
+            serverAddress = properties.getProperty("server.ip");
+            serverPort = Integer.parseInt(properties.getProperty("server.port"));
+            logDays = Integer.parseInt(properties.getProperty("days.for.log"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @NotNull
@@ -349,11 +399,11 @@ public class ClientGuiController {
     }
 
     public static void main (String[] args){
-        Properties properties = new Properties();
-        FileInputStream fileServerProperties ;
 
+        FileInputStream fileServerProperties ;
+        pathToProperties = args[0];
         try {
-            fileServerProperties = new FileInputStream(args[0]);
+            fileServerProperties = new FileInputStream(pathToProperties);
             properties.load(fileServerProperties);
             serverAddress = properties.getProperty("server.ip");
             serverPort = Integer.parseInt(properties.getProperty("server.port"));

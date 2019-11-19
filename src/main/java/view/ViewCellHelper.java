@@ -1,10 +1,11 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 
 class ViewCellHelper {
-    private static final int TEXT_SIZE = 7;
+    private static final int TEXT_SIZE = 9;
     private static final int HEIGHT = 30;
     private static int WIDTH_1;
     private static int WIDTH_2;
@@ -108,6 +109,30 @@ class ViewCellHelper {
         button4.setFont(new Font("Arial",Font.PLAIN,TEXT_SIZE));
         button5.setFont(new Font("Arial",Font.PLAIN,TEXT_SIZE));
         button6.setFont(new Font("Arial",Font.PLAIN,TEXT_SIZE));
+        button2.setHorizontalAlignment(SwingConstants.LEFT);
+        button3.setHorizontalAlignment(SwingConstants.LEFT);
+        button4.setHorizontalAlignment(SwingConstants.LEFT);
+        button5.setHorizontalAlignment(SwingConstants.LEFT);
+        button6.setHorizontalAlignment(SwingConstants.LEFT);
+        button1.setBorder(BorderFactory.createEtchedBorder(1));
+        button2.setBorder(BorderFactory.createEtchedBorder(1));
+        button3.setBorder(BorderFactory.createEtchedBorder(1));
+        button4.setBorder(BorderFactory.createEtchedBorder(1));
+        button5.setBorder(BorderFactory.createEtchedBorder(1));
+        button6.setBorder(BorderFactory.createEtchedBorder(1));
+
+//        button1.setContentAreaFilled(false);
+//        button1.setBorder(new LineBorder(Color.BLACK));
+//        button2.setContentAreaFilled(false);
+//        button2.setBorder(new LineBorder(Color.BLACK));
+//        button3.setContentAreaFilled(false);
+//        button3.setBorder(new LineBorder(Color.BLACK));
+//        button4.setContentAreaFilled(false);
+//        button4.setBorder(new LineBorder(Color.BLACK));
+//        button5.setContentAreaFilled(false);
+//        button5.setBorder(new LineBorder(Color.BLACK));
+//        button6.setContentAreaFilled(false);
+//        button6.setBorder(new LineBorder(Color.BLACK));
     }
     public void renderButton(String label,int buttonNum){
         JButton tmp = null;

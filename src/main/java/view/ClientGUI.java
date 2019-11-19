@@ -17,10 +17,16 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 import static javax.swing.JOptionPane.YES_NO_OPTION;
@@ -50,6 +56,7 @@ public class ClientGUI extends JFrame {
     private JTextArea txtaLog;
     private JScrollPane sclLog;
     private JPanel pnlRight;
+    private JPanel pnlTopInfo;
     private ClientGuiController controller;
     private JComboBox<String> cmbLogin = new JComboBox<String>();
     private JPasswordField txtPassword = new JPasswordField();
@@ -152,12 +159,14 @@ public class ClientGUI extends JFrame {
                     btnPickUp.setEnabled(false);
                     controller.setBusy(true);
                     showAvailableCells(material, lblTableName.getText(), 0);
+                    selectMaterial(material);
                 } else {
                     cmbReference.setEnabled(true);
                     btnPickUp.setEnabled(true);
                     controller.setBusy(false);
                     showAvailableCells(material, lblTableName.getText(), 1);
                     refreshRack();
+                    selectMaterial(material);
                 }
             }
         });
@@ -234,7 +243,53 @@ public class ClientGUI extends JFrame {
                 lblSelectedCell.setText("");
             }
         });
+        //lblSelectedCell.addPropertyChangeListener();
+        PropertyChangeListener l = new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                boolean isExist = false;
+                for (Rack rack : controller.getModel().getRacks()) {
+                    if (rack.getName().equals(lblTableName.getText())) {
+                        String cellName = lblSelectedCell.getText().split("\\[")[0];
+                        int pos = Integer.parseInt(lblSelectedCell.getText().split("\\[")[1].substring(0, 1));
+                        Cell cellByName = rack.getCellByName(cellName);
+                        if (cellByName.getPallets() != null) {
+                            for (Pallet p : cellByName.getPallets()) {
+                                if (p.getPosition() == pos) {
 
+                                    //  DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm", Locale.ENGLISH);
+                                    LocalDateTime loadingDate = p.getLoadingDate();
+                                    String date =
+                                            DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
+                                                    .withLocale(new Locale("ru", "RU"))
+                                                    .format(loadingDate);
+                                    //txtCellInfo.setText(p.getMaterial() + "\n" + loadingDate.format(dateTimeFormatter));
+                                    txtCellInfo.setText(p.getMaterial() + "\n" + date);
+                                    isExist = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!isExist) {
+                    txtCellInfo.setText("");
+                }
+            }
+        };
+        lblSelectedCell.addPropertyChangeListener("text", l);
+    }
+
+    private void selectMaterial(String material) {
+        int itemCount = cmbReference.getItemCount();
+        int index = 0;
+        for (int i = 0; i < itemCount; i++) {
+            if (cmbReference.getItemAt(i).equals(material)) {
+                index = i;
+                break;
+            }
+        }
+        cmbReference.setSelectedIndex(index);
     }
 
     private void showAvailableCells(String reference, String rackName, int stage) {
@@ -319,7 +374,8 @@ public class ClientGUI extends JFrame {
                     + controller.getMESSAGE_DELIMITER() + material
                     + controller.getMESSAGE_DELIMITER() + lblTableName.getText());
         } else {
-            TreeMap<Pallet, String> map = new TreeMap<>();
+            //   TreeMap<Pallet, String> map = new TreeMap<>();
+            HashMap<String, Pallet> map = new HashMap<>();
             LocalDateTime currentDate = LocalDateTime.now();
             currentDate = currentDate.minusDays(controller.BLOCKED_DAYS);
             int count = 0;
@@ -333,7 +389,8 @@ public class ClientGUI extends JFrame {
                                     count++;
                                     LocalDateTime loadingDate = p.getLoadingDate();
                                     if (loadingDate.isBefore(currentDate)) {
-                                        map.put(p, rack.getName() + "," + cells[i][j].getName());
+                                        //                 map.put(p, rack.getName() + "," + cells[i][j].getName());
+                                        map.put(count + "," + rack.getName() + "," + cells[i][j].getName() + "," + "[" + position + "]", p);
                                     }
                                 }
                             }
@@ -341,17 +398,26 @@ public class ClientGUI extends JFrame {
                     }
                 }
             }
-
+            //  System.out.println(map2.keySet());
             if (!map.isEmpty()) {
                 if (count < 2) {
                     JOptionPane.showMessageDialog(pnlMain, "На стеллажах останеться последний паллет с материалом " + material, "ВНИМАНИЕ!", JOptionPane.INFORMATION_MESSAGE);
                     String event = String.format("Пользователь %s, предупрежден о том что остается последний паллет c материалом %s на стеллажах", activeUser, material);
                     controller.sendMessage(MessageType.EVENT, controller.events.get("WARN") + "-_-" + event);
                 }
-                Pallet pallet = map.firstKey();
-                String s = map.get(pallet);
-                String rackString = s.split(",")[0];
-                String cellString = s.split(",")[1];
+                LocalDateTime first = currentDate;
+                Pallet pallet = new Pallet();
+                String key = "";
+                for (String s : map.keySet()) {
+                    Pallet p = map.get(s);
+                    if (p.getLoadingDate().isBefore(first)) {
+                        //      first = p.getLoadingDate();
+                        pallet = p;
+                        key = s;
+                    }
+                }
+                String rackString = key.split(",")[1];
+                String cellString = key.split(",")[2];
                 Rack rack = null;
                 for (Rack r : controller.getModel().getRacks()) {
                     if (r.getName().equals(rackString)) {
@@ -403,7 +469,7 @@ public class ClientGUI extends JFrame {
                         case 0:
                             printTable(rackString);
                             cmbRackName.setSelectedItem(rackString);
-                            showMaterialForPickUP(material, true);
+                            showMaterialForPickUP(material, false);
                             break;
                         case 1:
                             break;
@@ -449,10 +515,36 @@ public class ClientGUI extends JFrame {
     public void serverStatus() {
         UIManager.put("OptionPane.yesButtonText", "Подключиться");
         UIManager.put("OptionPane.noButtonText", "Выход");
-        int input = JOptionPane.showConfirmDialog(this, "Сервер не доступен!", "Подключение", YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        UIManager.put("OptionPane.cancelButtonText", "Настройки");
+        int input = JOptionPane.showConfirmDialog(this, "Сервер не доступен!", "Подключение", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
         switch (input) {
             case 1:
                 controller.exit();
+                break;
+            case 2:
+                JPanel panel = new JPanel();
+                JLabel labelIP = new JLabel("IP адрес сервера :");
+                JTextField ip = new JTextField(16);
+                ip.setText(controller.getServerAddress());
+                JLabel labelPort = new JLabel("   Port сервера :");
+                JTextField port = new JTextField(8);
+                port.setText(String.valueOf(controller.getServerPort()));
+                panel.add(labelIP);
+                panel.add(ip);
+                panel.add(labelPort);
+                panel.add(port);
+                String[] options = new String[]{"OK", "Отмена"};
+                int option = JOptionPane.showOptionDialog(null, panel, "Настройка подключения",
+                        JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                        null, options, ip);
+                String newIP = "";
+                String newPort = "";
+                if (option == 0) {
+                    newIP = String.valueOf(ip.getText());
+                    newPort = String.valueOf(port.getText());
+                    controller.updateProperties("server.ip", newIP);
+                    controller.updateProperties("server.port", newPort);
+                }
                 break;
             default:
                 break;
@@ -486,6 +578,7 @@ public class ClientGUI extends JFrame {
                 name = o.getFirstName() + " " + o.getSecondName();
             }
         }
+
         JPanel panel = new JPanel();
         JLabel label = new JLabel(name + " введите ваш пароль :");
         JPasswordField pass = new JPasswordField(15);
@@ -493,7 +586,7 @@ public class ClientGUI extends JFrame {
         panel.add(pass);
         String[] options = new String[]{"OK", "Отмена"};
         int option = JOptionPane.showOptionDialog(null, panel, "Ввод пароля",
-                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                 null, options, pass);
         String password = "";
         if (option == 0) {
@@ -545,7 +638,7 @@ public class ClientGUI extends JFrame {
                 tmpUser = u;
             }
         }
-        lblCurrentUser.setText("Пользователь: " + tmpUser.getFirstName() + " " + tmpUser.getSecondName());
+        lblCurrentUser.setText("User: " + tmpUser.getFirstName() + " " + tmpUser.getSecondName());
 
         switch (tmpUser.getRole()) {
             case "Administrator":
@@ -628,7 +721,7 @@ public class ClientGUI extends JFrame {
             }
         });
         printTable(cmbRackName.getSelectedItem().toString());
-
+        // pack();
     }
 
 
@@ -652,7 +745,7 @@ public class ClientGUI extends JFrame {
 
     private void printTable(String tableName) {
         selectReferenceList(tableName);
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.ENGLISH);
+        //DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.ENGLISH);
         Rack rack = null;
         for (Rack r : controller.getModel().getRacks()) {
             if (tableName.equals(r.getName())) {
@@ -674,6 +767,8 @@ public class ClientGUI extends JFrame {
         TableCellRenderer tableCellRenderer = new MyCellRender(scrTable.getWidth(), currentRackColumnCount);
         TableCellEditor tableCellEditor = new MyCellEditor(new JCheckBox(), scrTable.getWidth(), currentRackColumnCount);
         mainTable.setModel(tblModel);
+        mainTable.setGridColor(Color.DARK_GRAY);
+        //mainTable.setGridColor();
         JTable rowTable = new RowNumberTable(mainTable);
         scrTable.setRowHeaderView(rowTable);
         for (int i = 0; i < currentRackRowCount; i++) {
@@ -687,7 +782,8 @@ public class ClientGUI extends JFrame {
                             position = pallet.getPosition();
                             String currentValue = (String) mainTable.getValueAt(i, j);
                             if (currentValue == null || currentValue.equals("")) {
-                                data.setValue(position, pallet.getMaterial() + "<br>" + pallet.getLoadingDate().format(dateTimeFormatter));
+                                // data.setValue(position, pallet.getMaterial() + "<br>" + pallet.getLoadingDate().format(dateTimeFormatter));
+                                data.setValue(position, pallet.getMaterial());
                             } else {
                                 for (int k = 0; k < currentValue.split(",").length; k++) {
                                     if (data.getValue(k).equals(" ")) {
@@ -699,7 +795,8 @@ public class ClientGUI extends JFrame {
                                     }
                                 }
                                 if (data.getValue(position).equals(" ")) {
-                                    data.setValue(position, pallet.getMaterial() + "<br>" + pallet.getLoadingDate().format(dateTimeFormatter));
+                                    // data.setValue(position, pallet.getMaterial() + "<br>" + pallet.getLoadingDate().format(dateTimeFormatter));
+                                    data.setValue(position, pallet.getMaterial());
                                 } else {
                                     System.out.println("Error #2, position not empty");
                                 }
@@ -753,6 +850,7 @@ public class ClientGUI extends JFrame {
         for (Rack r : controller.getModel().getRacks()) {
             listOfRacks.add(r.getName());
         }
+
         cmbRackName.removeAllItems();
         Collections.sort(listOfRacks);
         for (String s : listOfRacks) {
@@ -794,98 +892,120 @@ public class ClientGUI extends JFrame {
      */
     private void $$$setupUI$$$() {
         pnlMain = new JPanel();
-        pnlMain.setLayout(new GridLayoutManager(8, 6, new Insets(1, 0, 0, 0), -1, -1));
+        pnlMain.setLayout(new GridLayoutManager(2, 6, new Insets(0, 0, 0, 0), -1, -1));
+        pnlMain.setAlignmentX(0.0f);
+        pnlMain.setAlignmentY(0.0f);
+        pnlMain.setAutoscrolls(false);
+        pnlMain.setMaximumSize(new Dimension(1280, 800));
+        pnlMain.setMinimumSize(new Dimension(1280, 800));
+        pnlMain.setPreferredSize(new Dimension(1280, 800));
         cmbRackName = new JComboBox();
         cmbRackName.setAlignmentX(1.0f);
         Font cmbRackNameFont = this.$$$getFont$$$(null, -1, 36, cmbRackName.getFont());
         if (cmbRackNameFont != null) cmbRackName.setFont(cmbRackNameFont);
         cmbRackName.setName(ResourceBundle.getBundle("properties/labelNames").getString("cmbRackName"));
-        pnlMain.add(cmbRackName, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(300, 40), new Dimension(300, 40), new Dimension(300, 40), 1, false));
+        pnlMain.add(cmbRackName, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(300, 40), new Dimension(300, 40), new Dimension(300, 40), 1, false));
         btnLoad = new JButton();
         btnLoad.setAlignmentX(0.0f);
         btnLoad.setMargin(new Insets(0, 0, 0, 0));
         btnLoad.setName(ResourceBundle.getBundle("properties/labelNames").getString("btnLoad"));
         this.$$$loadButtonText$$$(btnLoad, ResourceBundle.getBundle("strings").getString("btn_Load"));
-        pnlMain.add(btnLoad, new GridConstraints(7, 1, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(160, 40), new Dimension(160, 40), new Dimension(160, 40), 0, false));
+        pnlMain.add(btnLoad, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(160, 40), new Dimension(160, 40), new Dimension(160, 40), 0, false));
         btnPickUp = new JButton();
+        btnPickUp.setHorizontalAlignment(0);
+        btnPickUp.setHorizontalTextPosition(11);
         btnPickUp.setName(ResourceBundle.getBundle("properties/labelNames").getString("btnPickUp"));
         this.$$$loadButtonText$$$(btnPickUp, ResourceBundle.getBundle("strings").getString("btn_PickUp"));
-        pnlMain.add(btnPickUp, new GridConstraints(7, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(160, 40), new Dimension(160, 40), new Dimension(160, 40), 0, false));
+        pnlMain.add(btnPickUp, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(160, 40), new Dimension(160, 40), new Dimension(160, 40), 0, false));
         cmbReference = new JComboBox();
         Font cmbReferenceFont = this.$$$getFont$$$(null, -1, 20, cmbReference.getFont());
         if (cmbReferenceFont != null) cmbReference.setFont(cmbReferenceFont);
         cmbReference.setName(ResourceBundle.getBundle("properties/labelNames").getString("cmbReference"));
-        pnlMain.add(cmbReference, new GridConstraints(7, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(200, 30), new Dimension(200, 30), new Dimension(200, 30), 0, false));
+        pnlMain.add(cmbReference, new GridConstraints(1, 3, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(200, 30), new Dimension(200, 30), new Dimension(200, 30), 0, false));
         rbSelectDate = new JRadioButton();
         this.$$$loadButtonText$$$(rbSelectDate, ResourceBundle.getBundle("strings").getString("btn_SelectDate"));
-        pnlMain.add(rbSelectDate, new GridConstraints(7, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(303, 19), null, 0, false));
+        pnlMain.add(rbSelectDate, new GridConstraints(1, 4, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(100, 25), new Dimension(100, 25), new Dimension(100, 25), 0, false));
         scrTable = new JScrollPane();
-        pnlMain.add(scrTable, new GridConstraints(0, 0, 7, 5, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(-1, 740), new Dimension(-1, 740), new Dimension(-1, 740), 0, false));
+        scrTable.setHorizontalScrollBarPolicy(31);
+        pnlMain.add(scrTable, new GridConstraints(0, 0, 1, 5, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, 1, 1, null, null, null, 0, false));
         mainTable = new JTable();
+        mainTable.setMaximumSize(new Dimension(1100, 640));
+        mainTable.setMinimumSize(new Dimension(1100, 640));
         mainTable.setName(ResourceBundle.getBundle("properties/labelNames").getString("mainTable"));
-        mainTable.setPreferredScrollableViewportSize(new Dimension(450, 450));
+        mainTable.setPreferredScrollableViewportSize(new Dimension(1100, 640));
+        mainTable.setPreferredSize(new Dimension(1100, 640));
         scrTable.setViewportView(mainTable);
         pnlRight = new JPanel();
-        pnlRight.setLayout(new GridLayoutManager(7, 2, new Insets(0, 0, 0, 0), -1, -1));
+        pnlRight.setLayout(new GridLayoutManager(6, 1, new Insets(0, 0, 0, 0), -1, -1));
         pnlRight.setName("pnlRight");
-        pnlMain.add(pnlRight, new GridConstraints(0, 5, 7, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        pnlMain.add(pnlRight, new GridConstraints(0, 5, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, null, new Dimension(354, 781), null, 0, false));
+        sclLog = new JScrollPane();
+        Font sclLogFont = this.$$$getFont$$$(null, -1, 9, sclLog.getFont());
+        if (sclLogFont != null) sclLog.setFont(sclLogFont);
+        pnlRight.add(sclLog, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, 1, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        txtaLog = new JTextArea();
+        Font txtaLogFont = this.$$$getFont$$$(null, -1, 8, txtaLog.getFont());
+        if (txtaLogFont != null) txtaLog.setFont(txtaLogFont);
+        txtaLog.setMaximumSize(new Dimension(200, 300));
+        txtaLog.setMinimumSize(new Dimension(200, 300));
+        txtaLog.setPreferredSize(new Dimension(200, 300));
+        sclLog.setViewportView(txtaLog);
+        scrDataPane = new JScrollPane();
+        scrDataPane.setName("scrDataPane");
+        pnlRight.add(scrDataPane, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, 1, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        txtCellInfo = new JTextArea();
+        Font txtCellInfoFont = this.$$$getFont$$$(null, Font.BOLD, 16, txtCellInfo.getFont());
+        if (txtCellInfoFont != null) txtCellInfo.setFont(txtCellInfoFont);
+        txtCellInfo.setMaximumSize(new Dimension(150, 50));
+        txtCellInfo.setMinimumSize(new Dimension(150, 50));
+        txtCellInfo.setName(ResourceBundle.getBundle("properties/labelNames").getString("txtCellInfo"));
+        txtCellInfo.setPreferredSize(new Dimension(150, 50));
+        txtCellInfo.setWrapStyleWord(true);
+        scrDataPane.setViewportView(txtCellInfo);
+        pnlTopInfo = new JPanel();
+        pnlTopInfo.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        pnlTopInfo.setName("pnlTopInfo");
+        pnlRight.add(pnlTopInfo, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         lblTableName = new JLabel();
         Font lblTableNameFont = this.$$$getFont$$$(null, Font.BOLD, 26, lblTableName.getFont());
         if (lblTableNameFont != null) lblTableName.setFont(lblTableNameFont);
         lblTableName.setText("");
-        pnlRight.add(lblTableName, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(300, -1), new Dimension(300, -1), new Dimension(300, -1), 0, false));
-        sclLog = new JScrollPane();
-        Font sclLogFont = this.$$$getFont$$$(null, -1, 9, sclLog.getFont());
-        if (sclLogFont != null) sclLog.setFont(sclLogFont);
-        pnlRight.add(sclLog, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(300, 500), new Dimension(300, 500), new Dimension(300, 500), 0, false));
-        txtaLog = new JTextArea();
-        Font txtaLogFont = this.$$$getFont$$$(null, -1, 8, txtaLog.getFont());
-        if (txtaLogFont != null) txtaLog.setFont(txtaLogFont);
-        sclLog.setViewportView(txtaLog);
-        pnlManager = new JPanel();
-        pnlManager.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        pnlRight.add(pnlManager, new GridConstraints(4, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(300, 60), new Dimension(300, 60), new Dimension(300, 60), 0, false));
-        pnlManager.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_ManagerMenu")));
-        cmbManagerFunctions = new JComboBox();
-        pnlManager.add(cmbManagerFunctions, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(200, 30), new Dimension(200, 30), new Dimension(200, 30), 0, false));
-        btnRunManagerCommand = new JButton();
-        this.$$$loadButtonText$$$(btnRunManagerCommand, ResourceBundle.getBundle("strings").getString("btn_Ok"));
-        pnlManager.add(btnRunManagerCommand, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(60, 30), new Dimension(60, 30), new Dimension(60, 30), 0, false));
-        pnlStoreKeeper = new JPanel();
-        pnlStoreKeeper.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        pnlRight.add(pnlStoreKeeper, new GridConstraints(5, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(300, 60), new Dimension(300, 60), new Dimension(300, 60), 0, false));
-        pnlStoreKeeper.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_KeeperFunctions")));
-        btnForcePickUp = new JButton();
-        this.$$$loadButtonText$$$(btnForcePickUp, ResourceBundle.getBundle("strings").getString("btn_PickUpForce"));
-        pnlStoreKeeper.add(btnForcePickUp, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(180, 30), new Dimension(180, 30), new Dimension(180, 30), 0, false));
-        pnlLogisticDriver = new JPanel();
-        pnlLogisticDriver.setLayout(new GridLayoutManager(3, 1, new Insets(0, 5, 0, 5), -1, -1));
-        pnlRight.add(pnlLogisticDriver, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(300, 100), new Dimension(300, 100), new Dimension(300, 100), 0, false));
-        pnlLogisticDriver.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
-        rbShowRef = new JRadioButton();
-        this.$$$loadButtonText$$$(rbShowRef, ResourceBundle.getBundle("strings").getString("txt_Show"));
-        pnlLogisticDriver.add(rbShowRef, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        rbAvailableCells = new JRadioButton();
-        this.$$$loadButtonText$$$(rbAvailableCells, ResourceBundle.getBundle("strings").getString("txt_AvailableCell"));
-        pnlLogisticDriver.add(rbAvailableCells, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final Spacer spacer1 = new Spacer();
-        pnlLogisticDriver.add(spacer1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(-1, 10), new Dimension(-1, 10), new Dimension(-1, 10), 0, false));
-        scrDataPane = new JScrollPane();
-        scrDataPane.setName("scrDataPane");
-        pnlRight.add(scrDataPane, new GridConstraints(1, 0, 2, 2, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(300, 60), new Dimension(300, 60), new Dimension(300, 60), 2, false));
-        txtCellInfo = new JTextArea();
-        Font txtCellInfoFont = this.$$$getFont$$$(null, -1, 14, txtCellInfo.getFont());
-        if (txtCellInfoFont != null) txtCellInfo.setFont(txtCellInfoFont);
-        txtCellInfo.setName(ResourceBundle.getBundle("properties/labelNames").getString("txtCellInfo"));
-        txtCellInfo.setWrapStyleWord(true);
-        scrDataPane.setViewportView(txtCellInfo);
+        pnlTopInfo.add(lblTableName, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(100, -1), new Dimension(100, -1), new Dimension(100, -1), 0, false));
         lblSelectedCell = new JLabel();
         lblSelectedCell.setName(ResourceBundle.getBundle("properties/labelNames").getString("lblSelectedCell"));
         lblSelectedCell.setText("");
-        pnlRight.add(lblSelectedCell, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(40, 20), new Dimension(40, 20), new Dimension(40, 20), 0, false));
+        pnlTopInfo.add(lblSelectedCell, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(40, 20), new Dimension(40, 20), new Dimension(40, 20), 0, false));
+        pnlManager = new JPanel();
+        pnlManager.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        pnlRight.add(pnlManager, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        pnlManager.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_ManagerMenu")));
+        btnRunManagerCommand = new JButton();
+        Font btnRunManagerCommandFont = this.$$$getFont$$$(null, -1, 10, btnRunManagerCommand.getFont());
+        if (btnRunManagerCommandFont != null) btnRunManagerCommand.setFont(btnRunManagerCommandFont);
+        this.$$$loadButtonText$$$(btnRunManagerCommand, ResourceBundle.getBundle("strings").getString("btn_Ok"));
+        pnlManager.add(btnRunManagerCommand, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(80, 30), new Dimension(80, 30), new Dimension(80, 30), 0, false));
+        cmbManagerFunctions = new JComboBox();
+        pnlManager.add(cmbManagerFunctions, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(-1, 30), new Dimension(-1, 30), new Dimension(-1, 30), 0, false));
+        pnlStoreKeeper = new JPanel();
+        pnlStoreKeeper.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        pnlRight.add(pnlStoreKeeper, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        pnlStoreKeeper.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_KeeperFunctions")));
+        btnForcePickUp = new JButton();
+        this.$$$loadButtonText$$$(btnForcePickUp, ResourceBundle.getBundle("strings").getString("btn_PickUpForce"));
+        pnlStoreKeeper.add(btnForcePickUp, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(180, 30), new Dimension(180, 30), new Dimension(180, 30), 0, false));
+        pnlLogisticDriver = new JPanel();
+        pnlLogisticDriver.setLayout(new GridLayoutManager(2, 1, new Insets(0, 5, 0, 5), -1, -1));
+        pnlRight.add(pnlLogisticDriver, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        pnlLogisticDriver.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
+        rbShowRef = new JRadioButton();
+        this.$$$loadButtonText$$$(rbShowRef, ResourceBundle.getBundle("strings").getString("txt_Show"));
+        pnlLogisticDriver.add(rbShowRef, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        rbAvailableCells = new JRadioButton();
+        this.$$$loadButtonText$$$(rbAvailableCells, ResourceBundle.getBundle("strings").getString("txt_AvailableCell"));
+        pnlLogisticDriver.add(rbAvailableCells, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         lblCurrentUser = new JLabel();
         lblCurrentUser.setText("");
-        pnlMain.add(lblCurrentUser, new GridConstraints(7, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(300, -1), new Dimension(300, -1), new Dimension(300, -1), 0, false));
+        pnlMain.add(lblCurrentUser, new GridConstraints(1, 5, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
