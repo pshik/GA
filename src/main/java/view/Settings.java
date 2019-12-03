@@ -4,7 +4,7 @@ import com.google.common.graph.Network;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import controller.ClientGuiController;
-import org.apache.logging.log4j.core.appender.db.jpa.JpaAppender;
+
 
 import javax.swing.*;
 import javax.swing.text.DefaultFormatterFactory;

@@ -65,11 +65,11 @@ public class ServerController {
         SAPReference material = (SAPReference) references.get(refName);
         LocalDateTime dateForLoading = LocalDateTime.now();
         if (!manualDate.equals("null")){
-            System.out.println(manualDate);
-            System.out.println(dateForLoading);
+          //  System.out.println(manualDate);
+           // System.out.println(dateForLoading);
             DateTimeFormatter form = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             dateForLoading = LocalDateTime.parse(manualDate,form);
-            System.out.println(dateForLoading);
+           // System.out.println(dateForLoading);
 
         }
         Pallet pallet = new Pallet(material.getReference(),material.getSize(), dateForLoading);
@@ -149,7 +149,7 @@ public class ServerController {
             tmpRack.setCellByAddress(cell.getRow(),cell.getCol(),cell);
             //cells.replace(lblTableName + ":" + cellName, o);
             racks.replace(tmpRack.getName(),tmpRack);
-            LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: Load pallet. %s %s %s",currentUser,tmpRack.getName(),cellName,material.getReference()));
+            LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: Load pallet. %s %s[%s] %s",currentUser,tmpRack.getName(),cellName,pos,material.getReference()));
             LogParser.getInstance().updateLog();
           //  loadHistory();
             /// "User: currentUser: Successfully loading pallet. Rack1 cellA6 material
@@ -184,7 +184,7 @@ public class ServerController {
             } else {
                 tmpRack.setCellByAddress(cell.getRow(),cell.getCol(),cell);
                 racks.replace(tmpRack.getName(),tmpRack);
-                LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: PickUp pallet. %s %s %s",currentUser,lblTableName,cellName,refName));
+                LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: PickUp pallet. %s %s[%s] %s",currentUser,lblTableName,cellName,pos,refName));
                 LogParser.getInstance().updateLog();
                 isCorrect = true;
             }
@@ -209,7 +209,7 @@ public class ServerController {
                 }
                 rack.setCellByAddress(cell.getRow(),cell.getCol(),cell);
                 racks.replace(rack.getName(), rack);
-                LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: Force pickup pallet. %s %s %s", currentUser, lblTableName, cellName, refName));
+                LoggerFiFo.getInstance().getRootLogger().info(String.format("User %s: Force pickup pallet. %s %s[%s] %s", currentUser, lblTableName, cellName,pos, refName));
                 LogParser.getInstance().updateLog();
                 isCorrect = true;
         } catch (Exception e) {

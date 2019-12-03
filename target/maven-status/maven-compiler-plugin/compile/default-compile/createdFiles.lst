@@ -30,7 +30,6 @@ view\Settings$3.class
 view\ClientGUI$5.class
 controller\Test$2.class
 view\ReferenceSettings$6.class
-view\MyViewCellButton.class
 controller\ClientGuiController$1.class
 model\UserRoles.class
 view\MyCellEditor.class

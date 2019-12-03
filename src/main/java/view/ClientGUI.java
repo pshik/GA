@@ -19,11 +19,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -53,10 +50,9 @@ public class ClientGUI extends JFrame {
     private JComboBox<String> cmbManagerFunctions;
     private JButton btnRunManagerCommand;
     private JScrollPane scrDataPane;
-    private JTextArea txtaLog;
-    private JScrollPane sclLog;
     private JPanel pnlRight;
     private JPanel pnlTopInfo;
+    private JButton historyButton;
     private ClientGuiController controller;
     private JComboBox<String> cmbLogin = new JComboBox<String>();
     private JPasswordField txtPassword = new JPasswordField();
@@ -76,7 +72,7 @@ public class ClientGUI extends JFrame {
     }
 
     private int position;
-    private static final int ROW_HEIGHT = 90;
+    private static final int ROW_HEIGHT = 96;
 
     public String getActiveUser() {
         return activeUser;
@@ -89,8 +85,6 @@ public class ClientGUI extends JFrame {
         this.controller = controller;
         $$$setupUI$$$();
         initView();
-//        createUIComponents();
-//        TreeMap<Integer, String> listOfManagersCommands = controller.getListOfManagersCommands();
         Collection<String> values = listOfManagersCommands.values();
 
         try {
@@ -184,6 +178,7 @@ public class ClientGUI extends JFrame {
                     btnPickUp.setEnabled(false);
                     controller.setBusy(true);
                     showAllRefOnRack(material, lblTableName.getText(), 0);
+                    selectMaterial(material);
                 } else {
                     cmbReference.setEnabled(true);
                     btnLoad.setEnabled(true);
@@ -191,6 +186,7 @@ public class ClientGUI extends JFrame {
                     controller.setBusy(false);
                     showAllRefOnRack(material, lblTableName.getText(), 1);
                     refreshRack();
+                    selectMaterial(material);
                 }
             }
         });
@@ -278,6 +274,13 @@ public class ClientGUI extends JFrame {
             }
         };
         lblSelectedCell.addPropertyChangeListener("text", l);
+        historyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                History history = new History();
+                history.initView(controller);
+            }
+        });
     }
 
     private void selectMaterial(String material) {
@@ -398,7 +401,6 @@ public class ClientGUI extends JFrame {
                     }
                 }
             }
-            //  System.out.println(map2.keySet());
             if (!map.isEmpty()) {
                 if (count < 2) {
                     JOptionPane.showMessageDialog(pnlMain, "На стеллажах останеться последний паллет с материалом " + material, "ВНИМАНИЕ!", JOptionPane.INFORMATION_MESSAGE);
@@ -411,9 +413,9 @@ public class ClientGUI extends JFrame {
                 for (String s : map.keySet()) {
                     Pallet p = map.get(s);
                     if (p.getLoadingDate().isBefore(first)) {
-                        //      first = p.getLoadingDate();
                         pallet = p;
                         key = s;
+                        first = p.getLoadingDate();
                     }
                 }
                 String rackString = key.split(",")[1];
@@ -735,8 +737,10 @@ public class ClientGUI extends JFrame {
                 btnForcePickUp.setEnabled(true);
             case 2:
                 pnlManager.setVisible(true);
+                btnForcePickUp.setEnabled(true);
             case 3:
                 pnlStoreKeeper.setVisible(true);
+                btnForcePickUp.setEnabled(true);
             case 4:
                 pnlLogisticDriver.setVisible(true);
                 break;
@@ -783,7 +787,7 @@ public class ClientGUI extends JFrame {
                             String currentValue = (String) mainTable.getValueAt(i, j);
                             if (currentValue == null || currentValue.equals("")) {
                                 // data.setValue(position, pallet.getMaterial() + "<br>" + pallet.getLoadingDate().format(dateTimeFormatter));
-                                data.setValue(position, pallet.getMaterial());
+                                data.setValue(position, "P");
                             } else {
                                 for (int k = 0; k < currentValue.split(",").length; k++) {
                                     if (data.getValue(k).equals(" ")) {
@@ -858,28 +862,27 @@ public class ClientGUI extends JFrame {
         }
     }
 
-    public void refreshLog() {
-        txtaLog.setText("");
-        TreeMap<LocalDateTime, String> log = controller.getLog();
-        for (LocalDateTime dateTime : log.keySet()) {
-            if (dateTime.isAfter(LocalDateTime.now().minusDays(7))) {
-                DateTimeFormatter f = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm");
-                dateTime.format(f);
-                String mes = dateTime.format(f) + " : " + log.get(dateTime) + "\n";
-                try {
-                    txtaLog.getDocument().insertString(0, mes, null);
-                } catch (BadLocationException e) {
-                    e.printStackTrace();
-                }
-            }
-            //   txtaLog.append(dateTime + " : " + log.get(dateTime) + "\n");
-        }
-    }
+//    public void refreshLog() {
+//        txtaLog.setText("");
+//        TreeMap<LocalDateTime, String> log = controller.getLog();
+//        for (LocalDateTime dateTime : log.keySet()) {
+//            if (dateTime.isAfter(LocalDateTime.now().minusDays(7))) {
+//                DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+//                dateTime.format(f);
+//                String mes = dateTime.format(f) + " - " + log.get(dateTime) + "\n";
+//                try {
+//                    txtaLog.getDocument().insertString(0, mes, null);
+//                } catch (BadLocationException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
 
     public void refreshView() {
         refreshRackList();
         refreshRack();
-        refreshLog();
+        //refreshLog();
     }
 
 
@@ -892,120 +895,141 @@ public class ClientGUI extends JFrame {
      */
     private void $$$setupUI$$$() {
         pnlMain = new JPanel();
-        pnlMain.setLayout(new GridLayoutManager(2, 6, new Insets(0, 0, 0, 0), -1, -1));
+        pnlMain.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
         pnlMain.setAlignmentX(0.0f);
         pnlMain.setAlignmentY(0.0f);
         pnlMain.setAutoscrolls(false);
-        pnlMain.setMaximumSize(new Dimension(1280, 800));
-        pnlMain.setMinimumSize(new Dimension(1280, 800));
-        pnlMain.setPreferredSize(new Dimension(1280, 800));
+        pnlMain.setMaximumSize(new Dimension(1280, 780));
+        pnlMain.setMinimumSize(new Dimension(1280, 780));
+        pnlMain.setPreferredSize(new Dimension(1280, 780));
+        scrTable = new JScrollPane();
+        scrTable.setHorizontalScrollBarPolicy(31);
+        scrTable.setVerticalScrollBarPolicy(21);
+        pnlMain.add(scrTable, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(980, 780), new Dimension(980, 780), new Dimension(980, 780), 0, false));
+        mainTable = new JTable();
+        mainTable.setMaximumSize(new Dimension(950, 780));
+        mainTable.setMinimumSize(new Dimension(950, 780));
+        mainTable.setName(ResourceBundle.getBundle("properties/labelNames").getString("mainTable"));
+        mainTable.setPreferredScrollableViewportSize(new Dimension(950, 780));
+        mainTable.setPreferredSize(new Dimension(950, 780));
+        scrTable.setViewportView(mainTable);
+        pnlRight = new JPanel();
+        pnlRight.setLayout(new GridLayoutManager(12, 2, new Insets(0, 0, 0, 0), -1, -1));
+        pnlRight.setName("pnlRight");
+        pnlMain.add(pnlRight, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(300, -1), new Dimension(300, -1), new Dimension(300, -1), 0, false));
+        pnlRight.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), null));
+        pnlTopInfo = new JPanel();
+        pnlTopInfo.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        pnlTopInfo.setName("pnlTopInfo");
+        pnlRight.add(pnlTopInfo, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(280, -1), new Dimension(280, -1), new Dimension(280, -1), 0, false));
+        lblTableName = new JLabel();
+        Font lblTableNameFont = this.$$$getFont$$$(null, Font.BOLD, 22, lblTableName.getFont());
+        if (lblTableNameFont != null) lblTableName.setFont(lblTableNameFont);
+        lblTableName.setText("");
+        pnlTopInfo.add(lblTableName, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(200, 40), new Dimension(200, 40), new Dimension(200, 40), 0, false));
+        lblSelectedCell = new JLabel();
+        Font lblSelectedCellFont = this.$$$getFont$$$(null, Font.BOLD, 18, lblSelectedCell.getFont());
+        if (lblSelectedCellFont != null) lblSelectedCell.setFont(lblSelectedCellFont);
+        lblSelectedCell.setName(ResourceBundle.getBundle("properties/labelNames").getString("lblSelectedCell"));
+        lblSelectedCell.setText("");
+        pnlTopInfo.add(lblSelectedCell, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(60, 40), new Dimension(60, 40), new Dimension(60, 40), 0, false));
         cmbRackName = new JComboBox();
-        cmbRackName.setAlignmentX(1.0f);
-        Font cmbRackNameFont = this.$$$getFont$$$(null, -1, 36, cmbRackName.getFont());
+        cmbRackName.setAlignmentX(0.0f);
+        Font cmbRackNameFont = this.$$$getFont$$$(null, -1, 28, cmbRackName.getFont());
         if (cmbRackNameFont != null) cmbRackName.setFont(cmbRackNameFont);
         cmbRackName.setName(ResourceBundle.getBundle("properties/labelNames").getString("cmbRackName"));
-        pnlMain.add(cmbRackName, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(300, 40), new Dimension(300, 40), new Dimension(300, 40), 1, false));
-        btnLoad = new JButton();
-        btnLoad.setAlignmentX(0.0f);
-        btnLoad.setMargin(new Insets(0, 0, 0, 0));
-        btnLoad.setName(ResourceBundle.getBundle("properties/labelNames").getString("btnLoad"));
-        this.$$$loadButtonText$$$(btnLoad, ResourceBundle.getBundle("strings").getString("btn_Load"));
-        pnlMain.add(btnLoad, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(160, 40), new Dimension(160, 40), new Dimension(160, 40), 0, false));
-        btnPickUp = new JButton();
-        btnPickUp.setHorizontalAlignment(0);
-        btnPickUp.setHorizontalTextPosition(11);
-        btnPickUp.setName(ResourceBundle.getBundle("properties/labelNames").getString("btnPickUp"));
-        this.$$$loadButtonText$$$(btnPickUp, ResourceBundle.getBundle("strings").getString("btn_PickUp"));
-        pnlMain.add(btnPickUp, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(160, 40), new Dimension(160, 40), new Dimension(160, 40), 0, false));
+        pnlRight.add(cmbRackName, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(280, 40), new Dimension(280, 40), new Dimension(280, 40), 0, false));
+        scrDataPane = new JScrollPane();
+        scrDataPane.setHorizontalScrollBarPolicy(31);
+        scrDataPane.setName("scrDataPane");
+        scrDataPane.setVerticalScrollBarPolicy(21);
+        pnlRight.add(scrDataPane, new GridConstraints(10, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, 1, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(250, -1), new Dimension(250, -1), new Dimension(250, -1), 0, false));
+        txtCellInfo = new JTextArea();
+        txtCellInfo.setEditable(false);
+        Font txtCellInfoFont = this.$$$getFont$$$(null, Font.BOLD, 26, txtCellInfo.getFont());
+        if (txtCellInfoFont != null) txtCellInfo.setFont(txtCellInfoFont);
+        txtCellInfo.setMaximumSize(new Dimension(250, 120));
+        txtCellInfo.setMinimumSize(new Dimension(250, 120));
+        txtCellInfo.setName(ResourceBundle.getBundle("properties/labelNames").getString("txtCellInfo"));
+        txtCellInfo.setPreferredSize(new Dimension(250, 120));
+        txtCellInfo.setWrapStyleWord(true);
+        scrDataPane.setViewportView(txtCellInfo);
+        pnlLogisticDriver = new JPanel();
+        pnlLogisticDriver.setLayout(new GridLayoutManager(3, 1, new Insets(0, 5, 0, 5), -1, -1));
+        pnlRight.add(pnlLogisticDriver, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(200, -1), new Dimension(200, -1), new Dimension(200, -1), 0, false));
+        pnlLogisticDriver.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
+        rbShowRef = new JRadioButton();
+        Font rbShowRefFont = this.$$$getFont$$$(null, -1, 14, rbShowRef.getFont());
+        if (rbShowRefFont != null) rbShowRef.setFont(rbShowRefFont);
+        this.$$$loadButtonText$$$(rbShowRef, ResourceBundle.getBundle("strings").getString("txt_Show"));
+        pnlLogisticDriver.add(rbShowRef, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        rbAvailableCells = new JRadioButton();
+        Font rbAvailableCellsFont = this.$$$getFont$$$(null, -1, 14, rbAvailableCells.getFont());
+        if (rbAvailableCellsFont != null) rbAvailableCells.setFont(rbAvailableCellsFont);
+        this.$$$loadButtonText$$$(rbAvailableCells, ResourceBundle.getBundle("strings").getString("txt_AvailableCell"));
+        pnlLogisticDriver.add(rbAvailableCells, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        pnlLogisticDriver.add(spacer1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(-1, 30), new Dimension(-1, 30), new Dimension(-1, 30), 0, false));
+        pnlStoreKeeper = new JPanel();
+        pnlStoreKeeper.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        pnlRight.add(pnlStoreKeeper, new GridConstraints(7, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(250, -1), new Dimension(250, -1), new Dimension(250, -1), 0, false));
+        pnlStoreKeeper.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_KeeperFunctions")));
+        btnForcePickUp = new JButton();
+        Font btnForcePickUpFont = this.$$$getFont$$$(null, -1, 12, btnForcePickUp.getFont());
+        if (btnForcePickUpFont != null) btnForcePickUp.setFont(btnForcePickUpFont);
+        this.$$$loadButtonText$$$(btnForcePickUp, ResourceBundle.getBundle("strings").getString("btn_PickUpForce"));
+        pnlStoreKeeper.add(btnForcePickUp, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(200, 30), new Dimension(200, 30), new Dimension(200, 30), 0, false));
+        historyButton = new JButton();
+        Font historyButtonFont = this.$$$getFont$$$(null, -1, 12, historyButton.getFont());
+        if (historyButtonFont != null) historyButton.setFont(historyButtonFont);
+        this.$$$loadButtonText$$$(historyButton, ResourceBundle.getBundle("strings").getString("rb_History"));
+        pnlStoreKeeper.add(historyButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(200, 30), new Dimension(200, 30), new Dimension(200, 30), 0, false));
+        pnlManager = new JPanel();
+        pnlManager.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
+        pnlRight.add(pnlManager, new GridConstraints(8, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(270, -1), new Dimension(270, -1), new Dimension(270, -1), 0, false));
+        pnlManager.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_ManagerMenu")));
+        btnRunManagerCommand = new JButton();
+        Font btnRunManagerCommandFont = this.$$$getFont$$$(null, -1, 14, btnRunManagerCommand.getFont());
+        if (btnRunManagerCommandFont != null) btnRunManagerCommand.setFont(btnRunManagerCommandFont);
+        this.$$$loadButtonText$$$(btnRunManagerCommand, ResourceBundle.getBundle("strings").getString("btn_Ok"));
+        pnlManager.add(btnRunManagerCommand, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(120, 30), new Dimension(120, 30), new Dimension(120, 30), 0, false));
+        cmbManagerFunctions = new JComboBox();
+        Font cmbManagerFunctionsFont = this.$$$getFont$$$(null, -1, 12, cmbManagerFunctions.getFont());
+        if (cmbManagerFunctionsFont != null) cmbManagerFunctions.setFont(cmbManagerFunctionsFont);
+        pnlManager.add(cmbManagerFunctions, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(250, 50), new Dimension(250, 50), new Dimension(250, 50), 0, false));
         cmbReference = new JComboBox();
         Font cmbReferenceFont = this.$$$getFont$$$(null, -1, 20, cmbReference.getFont());
         if (cmbReferenceFont != null) cmbReference.setFont(cmbReferenceFont);
         cmbReference.setName(ResourceBundle.getBundle("properties/labelNames").getString("cmbReference"));
-        pnlMain.add(cmbReference, new GridConstraints(1, 3, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(200, 30), new Dimension(200, 30), new Dimension(200, 30), 0, false));
+        pnlRight.add(cmbReference, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(200, 40), new Dimension(200, 40), new Dimension(200, 40), 0, false));
+        btnLoad = new JButton();
+        btnLoad.setAlignmentX(0.0f);
+        Font btnLoadFont = this.$$$getFont$$$(null, -1, 14, btnLoad.getFont());
+        if (btnLoadFont != null) btnLoad.setFont(btnLoadFont);
+        btnLoad.setMargin(new Insets(0, 0, 0, 0));
+        btnLoad.setName(ResourceBundle.getBundle("properties/labelNames").getString("btnLoad"));
+        this.$$$loadButtonText$$$(btnLoad, ResourceBundle.getBundle("strings").getString("btn_Load"));
+        pnlRight.add(btnLoad, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(120, 60), new Dimension(120, 60), new Dimension(120, 60), 0, false));
+        btnPickUp = new JButton();
+        Font btnPickUpFont = this.$$$getFont$$$(null, -1, 14, btnPickUp.getFont());
+        if (btnPickUpFont != null) btnPickUp.setFont(btnPickUpFont);
+        btnPickUp.setHorizontalAlignment(0);
+        btnPickUp.setHorizontalTextPosition(11);
+        btnPickUp.setName(ResourceBundle.getBundle("properties/labelNames").getString("btnPickUp"));
+        this.$$$loadButtonText$$$(btnPickUp, ResourceBundle.getBundle("strings").getString("btn_PickUp"));
+        pnlRight.add(btnPickUp, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(120, 60), new Dimension(120, 60), new Dimension(120, 60), 0, false));
         rbSelectDate = new JRadioButton();
+        Font rbSelectDateFont = this.$$$getFont$$$(null, -1, 12, rbSelectDate.getFont());
+        if (rbSelectDateFont != null) rbSelectDate.setFont(rbSelectDateFont);
         this.$$$loadButtonText$$$(rbSelectDate, ResourceBundle.getBundle("strings").getString("btn_SelectDate"));
-        pnlMain.add(rbSelectDate, new GridConstraints(1, 4, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(100, 25), new Dimension(100, 25), new Dimension(100, 25), 0, false));
-        scrTable = new JScrollPane();
-        scrTable.setHorizontalScrollBarPolicy(31);
-        pnlMain.add(scrTable, new GridConstraints(0, 0, 1, 5, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, 1, 1, null, null, null, 0, false));
-        mainTable = new JTable();
-        mainTable.setMaximumSize(new Dimension(1100, 640));
-        mainTable.setMinimumSize(new Dimension(1100, 640));
-        mainTable.setName(ResourceBundle.getBundle("properties/labelNames").getString("mainTable"));
-        mainTable.setPreferredScrollableViewportSize(new Dimension(1100, 640));
-        mainTable.setPreferredSize(new Dimension(1100, 640));
-        scrTable.setViewportView(mainTable);
-        pnlRight = new JPanel();
-        pnlRight.setLayout(new GridLayoutManager(6, 1, new Insets(0, 0, 0, 0), -1, -1));
-        pnlRight.setName("pnlRight");
-        pnlMain.add(pnlRight, new GridConstraints(0, 5, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, null, new Dimension(354, 781), null, 0, false));
-        sclLog = new JScrollPane();
-        Font sclLogFont = this.$$$getFont$$$(null, -1, 9, sclLog.getFont());
-        if (sclLogFont != null) sclLog.setFont(sclLogFont);
-        pnlRight.add(sclLog, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, 1, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        txtaLog = new JTextArea();
-        Font txtaLogFont = this.$$$getFont$$$(null, -1, 8, txtaLog.getFont());
-        if (txtaLogFont != null) txtaLog.setFont(txtaLogFont);
-        txtaLog.setMaximumSize(new Dimension(200, 300));
-        txtaLog.setMinimumSize(new Dimension(200, 300));
-        txtaLog.setPreferredSize(new Dimension(200, 300));
-        sclLog.setViewportView(txtaLog);
-        scrDataPane = new JScrollPane();
-        scrDataPane.setName("scrDataPane");
-        pnlRight.add(scrDataPane, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, 1, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        txtCellInfo = new JTextArea();
-        Font txtCellInfoFont = this.$$$getFont$$$(null, Font.BOLD, 16, txtCellInfo.getFont());
-        if (txtCellInfoFont != null) txtCellInfo.setFont(txtCellInfoFont);
-        txtCellInfo.setMaximumSize(new Dimension(150, 50));
-        txtCellInfo.setMinimumSize(new Dimension(150, 50));
-        txtCellInfo.setName(ResourceBundle.getBundle("properties/labelNames").getString("txtCellInfo"));
-        txtCellInfo.setPreferredSize(new Dimension(150, 50));
-        txtCellInfo.setWrapStyleWord(true);
-        scrDataPane.setViewportView(txtCellInfo);
-        pnlTopInfo = new JPanel();
-        pnlTopInfo.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        pnlTopInfo.setName("pnlTopInfo");
-        pnlRight.add(pnlTopInfo, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        lblTableName = new JLabel();
-        Font lblTableNameFont = this.$$$getFont$$$(null, Font.BOLD, 26, lblTableName.getFont());
-        if (lblTableNameFont != null) lblTableName.setFont(lblTableNameFont);
-        lblTableName.setText("");
-        pnlTopInfo.add(lblTableName, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(100, -1), new Dimension(100, -1), new Dimension(100, -1), 0, false));
-        lblSelectedCell = new JLabel();
-        lblSelectedCell.setName(ResourceBundle.getBundle("properties/labelNames").getString("lblSelectedCell"));
-        lblSelectedCell.setText("");
-        pnlTopInfo.add(lblSelectedCell, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(40, 20), new Dimension(40, 20), new Dimension(40, 20), 0, false));
-        pnlManager = new JPanel();
-        pnlManager.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        pnlRight.add(pnlManager, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        pnlManager.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_ManagerMenu")));
-        btnRunManagerCommand = new JButton();
-        Font btnRunManagerCommandFont = this.$$$getFont$$$(null, -1, 10, btnRunManagerCommand.getFont());
-        if (btnRunManagerCommandFont != null) btnRunManagerCommand.setFont(btnRunManagerCommandFont);
-        this.$$$loadButtonText$$$(btnRunManagerCommand, ResourceBundle.getBundle("strings").getString("btn_Ok"));
-        pnlManager.add(btnRunManagerCommand, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(80, 30), new Dimension(80, 30), new Dimension(80, 30), 0, false));
-        cmbManagerFunctions = new JComboBox();
-        pnlManager.add(cmbManagerFunctions, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(-1, 30), new Dimension(-1, 30), new Dimension(-1, 30), 0, false));
-        pnlStoreKeeper = new JPanel();
-        pnlStoreKeeper.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        pnlRight.add(pnlStoreKeeper, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        pnlStoreKeeper.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_KeeperFunctions")));
-        btnForcePickUp = new JButton();
-        this.$$$loadButtonText$$$(btnForcePickUp, ResourceBundle.getBundle("strings").getString("btn_PickUpForce"));
-        pnlStoreKeeper.add(btnForcePickUp, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(180, 30), new Dimension(180, 30), new Dimension(180, 30), 0, false));
-        pnlLogisticDriver = new JPanel();
-        pnlLogisticDriver.setLayout(new GridLayoutManager(2, 1, new Insets(0, 5, 0, 5), -1, -1));
-        pnlRight.add(pnlLogisticDriver, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        pnlLogisticDriver.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
-        rbShowRef = new JRadioButton();
-        this.$$$loadButtonText$$$(rbShowRef, ResourceBundle.getBundle("strings").getString("txt_Show"));
-        pnlLogisticDriver.add(rbShowRef, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        rbAvailableCells = new JRadioButton();
-        this.$$$loadButtonText$$$(rbAvailableCells, ResourceBundle.getBundle("strings").getString("txt_AvailableCell"));
-        pnlLogisticDriver.add(rbAvailableCells, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pnlRight.add(rbSelectDate, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(100, 25), new Dimension(100, 25), new Dimension(100, 25), 0, false));
         lblCurrentUser = new JLabel();
         lblCurrentUser.setText("");
-        pnlMain.add(lblCurrentUser, new GridConstraints(1, 5, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pnlRight.add(lblCurrentUser, new GridConstraints(11, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(200, -1), new Dimension(200, -1), new Dimension(200, -1), 0, false));
+        final Spacer spacer2 = new Spacer();
+        pnlRight.add(spacer2, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(-1, 30), new Dimension(-1, 30), new Dimension(-1, 30), 0, false));
+        final Spacer spacer3 = new Spacer();
+        pnlRight.add(spacer3, new GridConstraints(9, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**
@@ -1059,6 +1083,10 @@ public class ClientGUI extends JFrame {
      */
     public JComponent $$$getRootComponent$$$() {
         return pnlMain;
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 
     private class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {

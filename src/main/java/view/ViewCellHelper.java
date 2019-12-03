@@ -6,19 +6,21 @@ import java.awt.*;
 
 class ViewCellHelper {
     private static final int TEXT_SIZE = 9;
-    private static final int HEIGHT = 30;
+    private static final int HEIGHT = 32;
     private static int WIDTH_1;
     private static int WIDTH_2;
     private static int WIDTH_3;
     private final static Color BUSY_COLOR = new Color(123,104,238);
     private final static Color BUSY_COLOR_FREE_CELL = new Color(192,192,192);
-    private final static Color BUSY_TEXT_COLOR = Color.WHITE;
+    //private final static Color BUSY_TEXT_COLOR = Color.WHITE;
+    private final static Color BUSY_TEXT_COLOR = new Color(123,104,238);
     private final static Color AVAILABLE_CEll = new Color(50,205,50);
     private final static Color DEFAULT_COLOR = new Color(255,228,225);
     private final static Color HIGHLIGHT_FIFO = new Color(255,165,0);
     private final static Color HIGHLIGHT = new Color(46,139,87);
     private final static Color BLOCKED_COLOR = new Color(0,0,0);
-
+    private static Icon iconPallet = null;
+    private static Icon iconEmpty = null;
     private  JButton button1;
     private  JButton button2;
     private  JButton button3;
@@ -35,6 +37,8 @@ class ViewCellHelper {
         this.button5 = button5;
         this.button6 = button6;
         this.panel = panel;
+        this.iconPallet = new ImageIcon(getClass().getResource("/icons/pallet.png"));
+        this.iconEmpty = new ImageIcon(getClass().getResource("/icons/empty.png"));
         WIDTH_1 = (fullWidth - 20) / column;
         WIDTH_2 = WIDTH_1/2;
         WIDTH_3 = WIDTH_1/3;
@@ -109,30 +113,17 @@ class ViewCellHelper {
         button4.setFont(new Font("Arial",Font.PLAIN,TEXT_SIZE));
         button5.setFont(new Font("Arial",Font.PLAIN,TEXT_SIZE));
         button6.setFont(new Font("Arial",Font.PLAIN,TEXT_SIZE));
-        button2.setHorizontalAlignment(SwingConstants.LEFT);
-        button3.setHorizontalAlignment(SwingConstants.LEFT);
-        button4.setHorizontalAlignment(SwingConstants.LEFT);
-        button5.setHorizontalAlignment(SwingConstants.LEFT);
-        button6.setHorizontalAlignment(SwingConstants.LEFT);
+//        button2.setHorizontalAlignment(SwingConstants.LEFT);
+//        button3.setHorizontalAlignment(SwingConstants.LEFT);
+//        button4.setHorizontalAlignment(SwingConstants.LEFT);
+//        button5.setHorizontalAlignment(SwingConstants.LEFT);
+//        button6.setHorizontalAlignment(SwingConstants.LEFT);
         button1.setBorder(BorderFactory.createEtchedBorder(1));
         button2.setBorder(BorderFactory.createEtchedBorder(1));
         button3.setBorder(BorderFactory.createEtchedBorder(1));
         button4.setBorder(BorderFactory.createEtchedBorder(1));
         button5.setBorder(BorderFactory.createEtchedBorder(1));
         button6.setBorder(BorderFactory.createEtchedBorder(1));
-
-//        button1.setContentAreaFilled(false);
-//        button1.setBorder(new LineBorder(Color.BLACK));
-//        button2.setContentAreaFilled(false);
-//        button2.setBorder(new LineBorder(Color.BLACK));
-//        button3.setContentAreaFilled(false);
-//        button3.setBorder(new LineBorder(Color.BLACK));
-//        button4.setContentAreaFilled(false);
-//        button4.setBorder(new LineBorder(Color.BLACK));
-//        button5.setContentAreaFilled(false);
-//        button5.setBorder(new LineBorder(Color.BLACK));
-//        button6.setContentAreaFilled(false);
-//        button6.setBorder(new LineBorder(Color.BLACK));
     }
     public void renderButton(String label,int buttonNum){
         JButton tmp = null;
@@ -161,27 +152,35 @@ class ViewCellHelper {
         }
         if (label.equals(" ")) {
             tmp.setText("<HTML></HTML>");
+            tmp.setIcon(iconEmpty);
         } else if (label.startsWith("#")){
             tmp.setText("<HTML></HTML>");
             tmp.setBackground(BUSY_COLOR_FREE_CELL);
+         //   tmp.setForeground(BUSY_COLOR_FREE_CELL);
+            tmp.setIcon(iconEmpty);
         } else if (label.startsWith("*")){
             tmp.setText("<HTML></HTML>");
             tmp.setBackground(AVAILABLE_CEll);
+            tmp.setIcon(iconEmpty);
         } else if (label.startsWith("@")){
             tmp.setText("<HTML>" + label.substring(1) + "</HTML>");
-            tmp.setForeground(Color.BLACK);
+            tmp.setForeground(HIGHLIGHT_FIFO);
+            tmp.setIcon(iconPallet);
             tmp.setBackground(HIGHLIGHT_FIFO);
         } else if (label.startsWith("^")){
             tmp.setText("<HTML>" + label.substring(1) + "</HTML>");
-            tmp.setForeground(Color.BLACK);
+            tmp.setForeground(HIGHLIGHT);
             tmp.setBackground(HIGHLIGHT);
+            tmp.setIcon(iconPallet);
         } else if (label.startsWith("=")){
             tmp.setText("<HTML></HTML>");
             tmp.setBackground(BLOCKED_COLOR);
+            tmp.setIcon(iconEmpty);
         } else {
             tmp.setText("<HTML>" + label + "</HTML>");
             tmp.setBackground(BUSY_COLOR);
             tmp.setForeground(BUSY_TEXT_COLOR);
+            tmp.setIcon(iconPallet);
         }
     }
     public void setDefaultBackgrounds(){
@@ -191,6 +190,11 @@ class ViewCellHelper {
         button4.setBackground(DEFAULT_COLOR);
         button5.setBackground(DEFAULT_COLOR);
         button6.setBackground(DEFAULT_COLOR);
+        button1.setIcon(iconEmpty);
+        button3.setIcon(iconEmpty);
+        button4.setIcon(iconEmpty);
+        button5.setIcon(iconEmpty);
+        button6.setIcon(iconEmpty);
     }
 
     public void setDefaultText() {

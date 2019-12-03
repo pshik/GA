@@ -1,6 +1,5 @@
 package view;
 
-import org.apache.logging.log4j.core.appender.db.jpa.JpaAppender;
 
 import javax.swing.*;
 import java.awt.*;

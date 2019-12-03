@@ -219,10 +219,8 @@ public class ClientGuiController {
                                 }
                                 if (!isBusy) {
                                     view.refreshRack();
+                                    connection.send(new Message(MessageType.LOG_REQUEST));
                                 }
-//                                if (!isBusy) {
-//                                    view.refreshRackList();
-//                                }
                                 break;
                             case USERS_UPDATE:
                                 connection.send(new Message(MessageType.USER_REQUEST));
@@ -237,8 +235,11 @@ public class ClientGuiController {
                             case LOG_UPDATED:
                                 connection.send(new Message(MessageType.LOG_REQUEST));
                                 message = connection.receive();
-                                updateLog(message);
-                                view.refreshLog();
+                                if (message.getType() == MessageType.LOG_UPDATED){
+                                    updateLog(message);
+                                }
+                              //  view.refreshLog();
+                              //  view.refreshRack();
                                 break;
                         }
                 }
@@ -332,7 +333,7 @@ public class ClientGuiController {
             }
             connection.send(new Message(MessageType.LOG_REQUEST));
             message = connection.receive();
-            if (message.getType() == MessageType.LOG_REQUEST){
+            if (message.getType() == MessageType.LOG_UPDATED){
                 updateLog(message);
             }
             view.mainView();
@@ -395,7 +396,7 @@ public class ClientGuiController {
         }
         log.clear();
         log = s;
-        view.refreshLog();
+      //  view.refreshLog();
     }
 
     public static void main (String[] args){

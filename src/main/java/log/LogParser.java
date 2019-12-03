@@ -33,7 +33,7 @@ public class LogParser{
 
     private void loadData(){
         try {
-            FileReader fileReader = new FileReader(System.getProperty("user.dir")+"\\src\\main\\resources\\logs\\output.log");
+            FileReader fileReader = new FileReader("logs/output.log");
             BufferedReader reader = new BufferedReader(fileReader);
             while (reader.ready()){
                 String line = reader.readLine();
@@ -52,9 +52,9 @@ public class LogParser{
 
     }
 
-    public static void main(String[] args) {
-        System.out.println(System.getProperty("user.dir"));
-    }
+//    public static void main(String[] args) {
+//        System.out.println(System.getProperty("user.dir"));
+//    }
     public String getEvent() {
         return event;
     }

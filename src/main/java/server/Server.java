@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -103,7 +102,7 @@ public class Server {
                     connectionMap.put(connection,u.getLogin());
                     return u.getLogin();
                 } else if (answer.getType() == MessageType.ACCESS_DENIED) {
-                    LoggerFiFo.getInstance().getRootLogger().log(Level.forName("SECURITY", 350), answer.getData());
+                    LoggerFiFo.getInstance().getRootLogger().log(Level.forName("SECURITY", 350), "Access denied! "+answer.getData());
 
                 } else if (answer.getType() == MessageType.GOODBYE){
                     connection.close();
@@ -126,9 +125,11 @@ public class Server {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 System.out.println("Произошла ошибка при обмене данными с удаленным адресом. ClassNotFoundException");
+                LoggerFiFo.getInstance().getRootLogger().log(Level.DEBUG,getClass().getName() + ": Произошла ошибка при обмене данными с удаленным адресом. ClassNotFoundException");
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Произошла ошибка при обмене данными с удаленным адресом. IOException");
+                LoggerFiFo.getInstance().getRootLogger().log(Level.DEBUG,getClass().getName() + ": Произошла ошибка при обмене данными с удаленным адресом. IOException");
             }
         }
 
@@ -166,18 +167,15 @@ public class Server {
                         connection.send(new Message(MessageType.USERS_UPDATE, data));
                         break;
                     case LOG_REQUEST:
-                     //   @JsonSerialize(keyUsing = MyPairSerializer.class)
                         Map<LocalDateTime, String> infoLog = serverController.getInfoLog();
-                   //     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         ObjectMapper om = new ObjectMapper();
-
                         om.registerModule(new JavaTimeModule());
                         om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-                        String jsonResult = om.writerWithDefaultPrettyPrinter()
-                                .writeValueAsString(infoLog);
-                //        om.writeValueAsString(infoLog);
-
-                        connection.send(new Message(MessageType.LOG_REQUEST, jsonResult));
+                        String jsonResult = om.writerWithDefaultPrettyPrinter().writeValueAsString(infoLog);
+                        connection.send(new Message(MessageType.LOG_UPDATED, jsonResult));
+                        break;
+                    case LOG_UPDATED:
+                        broadcastMessage(MessageType.LOG_UPDATED);
                         break;
                     case LOAD_PALLET:
                         data = m.getData();
@@ -204,7 +202,7 @@ public class Server {
                     case GOODBYE:
                         System.out.println("Польхователь: " + userName + " закончил работу. Используется соединение с удаленным адресом: " + socket.getRemoteSocketAddress());
                         connectionMap.remove(connection);
-                        connection.close();
+                        LoggerFiFo.getInstance().getRootLogger().log(Level.forName("SECURITY", 350), "User " + userName + " logout. Used address: " + socket.getRemoteSocketAddress());
                         connectionActive = false;
                         break;
                     case FORCED_PICKUP:
