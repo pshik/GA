@@ -25,40 +25,47 @@ class MyCellEditor extends DefaultCellEditor {
         viewCellHelper = new ViewCellHelper(panel,button1,button2,button3,button4,button5,button6,fullWidth,column);
         viewCellHelper.configureButtons();
         viewCellHelper.addButtons();
+
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAddress(0);
+                viewCellHelper.selectCell(0);
             }
         });
         button2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAddress(1);
+                viewCellHelper.selectCell(1);
             }
         });
         button3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAddress(2);
+                viewCellHelper.selectCell(2);
             }
         });
         button4.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAddress(3);
+                viewCellHelper.selectCell(3);
             }
         });
         button5.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAddress(4);
+                viewCellHelper.selectCell(4);
             }
         });
         button6.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setAddress(5);
+                viewCellHelper.selectCell(5);
             }
         });
     }

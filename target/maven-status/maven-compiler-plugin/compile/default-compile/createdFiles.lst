@@ -9,6 +9,7 @@ controller\ServerController.class
 view\MyCellEditor$6.class
 model\DataBuilder.class
 view\RackSettings$8.class
+view\ClientGUI$11.class
 view\ReferenceSettings$1.class
 view\ClientGUI$3.class
 view\MyCellRender.class
@@ -19,6 +20,7 @@ model\User.class
 controller\Test.class
 view\ClientGUI$6.class
 model\ClientGuiModel.class
+view\History$2.class
 model\SAPReference.class
 server\MessageType.class
 model\TableModel.class
@@ -30,6 +32,7 @@ view\Settings$3.class
 view\ClientGUI$5.class
 controller\Test$2.class
 view\ReferenceSettings$6.class
+view\History.class
 controller\ClientGuiController$1.class
 model\UserRoles.class
 view\MyCellEditor.class
@@ -63,6 +66,7 @@ controller\Test$1.class
 view\RackSettings$1.class
 view\Settings$4.class
 log\LogParser.class
+view\History$1.class
 controller\ClientGuiController$3.class
 view\ReferenceSettings$5.class
 view\UsersSettings$4.class
@@ -73,6 +77,7 @@ view\RackSettings$7.class
 view\MyCellEditor$4.class
 view\UsersSettings$1.class
 view\ImportData$3.class
+view\History$3.class
 view\RowNumberTable$RowNumberRenderer.class
 model\Rack.class
 view\Settings$6.class
@@ -84,6 +89,7 @@ view\UsersSettings$2.class
 view\ClientGUI$8.class
 view\ImportDataCells$2.class
 model\Pallet.class
+view\History$DateLabelFormatter.class
 view\RackSettings$6.class
 server\Server.class
 view\Settings$5.class
@@ -92,6 +98,7 @@ view\MyCellEditor$2.class
 view\RackSettings$5.class
 view\ViewCellHelper.class
 view\ClientGUI$1.class
+view\History$4.class
 controller\ClientGuiController.class
 view\ImportDataCells$1.class
 view\ReferenceSettings$3.class

@@ -174,12 +174,6 @@
             <version>1.7.1</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.kirviq</groupId>
-            <artifactId>dumbster</artifactId>
-            <version>1.7.1</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
 </project>

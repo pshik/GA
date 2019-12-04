@@ -72,7 +72,7 @@ public class ClientGUI extends JFrame {
     }
 
     private int position;
-    private static final int ROW_HEIGHT = 96;
+    private static final int ROW_HEIGHT = 87;
 
     public String getActiveUser() {
         return activeUser;
@@ -247,6 +247,7 @@ public class ClientGUI extends JFrame {
                 for (Rack rack : controller.getModel().getRacks()) {
                     if (rack.getName().equals(lblTableName.getText())) {
                         String cellName = lblSelectedCell.getText().split("\\[")[0];
+                        if (cellName.equals("")) break;
                         int pos = Integer.parseInt(lblSelectedCell.getText().split("\\[")[1].substring(0, 1));
                         Cell cellByName = rack.getCellByName(cellName);
                         if (cellByName.getPallets() != null) {
@@ -899,29 +900,29 @@ public class ClientGUI extends JFrame {
         pnlMain.setAlignmentX(0.0f);
         pnlMain.setAlignmentY(0.0f);
         pnlMain.setAutoscrolls(false);
-        pnlMain.setMaximumSize(new Dimension(1280, 780));
-        pnlMain.setMinimumSize(new Dimension(1280, 780));
-        pnlMain.setPreferredSize(new Dimension(1280, 780));
+        pnlMain.setMaximumSize(new Dimension(1280, 720));
+        pnlMain.setMinimumSize(new Dimension(1280, 720));
+        pnlMain.setPreferredSize(new Dimension(1280, 720));
         scrTable = new JScrollPane();
         scrTable.setHorizontalScrollBarPolicy(31);
         scrTable.setVerticalScrollBarPolicy(21);
-        pnlMain.add(scrTable, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(980, 780), new Dimension(980, 780), new Dimension(980, 780), 0, false));
+        pnlMain.add(scrTable, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(980, 710), new Dimension(980, 710), new Dimension(980, 710), 0, false));
         mainTable = new JTable();
-        mainTable.setMaximumSize(new Dimension(950, 780));
-        mainTable.setMinimumSize(new Dimension(950, 780));
+        mainTable.setMaximumSize(new Dimension(950, 700));
+        mainTable.setMinimumSize(new Dimension(950, 700));
         mainTable.setName(ResourceBundle.getBundle("properties/labelNames").getString("mainTable"));
-        mainTable.setPreferredScrollableViewportSize(new Dimension(950, 780));
-        mainTable.setPreferredSize(new Dimension(950, 780));
+        mainTable.setPreferredScrollableViewportSize(new Dimension(950, 700));
+        mainTable.setPreferredSize(new Dimension(950, 700));
         scrTable.setViewportView(mainTable);
         pnlRight = new JPanel();
-        pnlRight.setLayout(new GridLayoutManager(12, 2, new Insets(0, 0, 0, 0), -1, -1));
+        pnlRight.setLayout(new GridLayoutManager(11, 2, new Insets(0, 0, 0, 0), -1, -1));
         pnlRight.setName("pnlRight");
-        pnlMain.add(pnlRight, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(300, -1), new Dimension(300, -1), new Dimension(300, -1), 0, false));
+        pnlMain.add(pnlRight, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(300, 720), new Dimension(300, 720), new Dimension(300, 720), 0, false));
         pnlRight.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), null));
         pnlTopInfo = new JPanel();
         pnlTopInfo.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
         pnlTopInfo.setName("pnlTopInfo");
-        pnlRight.add(pnlTopInfo, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(280, -1), new Dimension(280, -1), new Dimension(280, -1), 0, false));
+        pnlRight.add(pnlTopInfo, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(280, 50), new Dimension(280, 50), new Dimension(280, 50), 0, false));
         lblTableName = new JLabel();
         Font lblTableNameFont = this.$$$getFont$$$(null, Font.BOLD, 22, lblTableName.getFont());
         if (lblTableNameFont != null) lblTableName.setFont(lblTableNameFont);
@@ -943,20 +944,20 @@ public class ClientGUI extends JFrame {
         scrDataPane.setHorizontalScrollBarPolicy(31);
         scrDataPane.setName("scrDataPane");
         scrDataPane.setVerticalScrollBarPolicy(21);
-        pnlRight.add(scrDataPane, new GridConstraints(10, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, 1, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(250, -1), new Dimension(250, -1), new Dimension(250, -1), 0, false));
+        pnlRight.add(scrDataPane, new GridConstraints(9, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, 1, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(250, 80), new Dimension(250, 80), new Dimension(250, 80), 0, false));
         txtCellInfo = new JTextArea();
         txtCellInfo.setEditable(false);
         Font txtCellInfoFont = this.$$$getFont$$$(null, Font.BOLD, 26, txtCellInfo.getFont());
         if (txtCellInfoFont != null) txtCellInfo.setFont(txtCellInfoFont);
-        txtCellInfo.setMaximumSize(new Dimension(250, 120));
-        txtCellInfo.setMinimumSize(new Dimension(250, 120));
+        txtCellInfo.setMaximumSize(new Dimension(250, 80));
+        txtCellInfo.setMinimumSize(new Dimension(250, 80));
         txtCellInfo.setName(ResourceBundle.getBundle("properties/labelNames").getString("txtCellInfo"));
-        txtCellInfo.setPreferredSize(new Dimension(250, 120));
+        txtCellInfo.setPreferredSize(new Dimension(250, 80));
         txtCellInfo.setWrapStyleWord(true);
         scrDataPane.setViewportView(txtCellInfo);
         pnlLogisticDriver = new JPanel();
         pnlLogisticDriver.setLayout(new GridLayoutManager(3, 1, new Insets(0, 5, 0, 5), -1, -1));
-        pnlRight.add(pnlLogisticDriver, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(200, -1), new Dimension(200, -1), new Dimension(200, -1), 0, false));
+        pnlRight.add(pnlLogisticDriver, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(200, 90), new Dimension(200, 90), new Dimension(200, 90), 0, false));
         pnlLogisticDriver.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null));
         rbShowRef = new JRadioButton();
         Font rbShowRefFont = this.$$$getFont$$$(null, -1, 14, rbShowRef.getFont());
@@ -972,7 +973,7 @@ public class ClientGUI extends JFrame {
         pnlLogisticDriver.add(spacer1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(-1, 30), new Dimension(-1, 30), new Dimension(-1, 30), 0, false));
         pnlStoreKeeper = new JPanel();
         pnlStoreKeeper.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        pnlRight.add(pnlStoreKeeper, new GridConstraints(7, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(250, -1), new Dimension(250, -1), new Dimension(250, -1), 0, false));
+        pnlRight.add(pnlStoreKeeper, new GridConstraints(7, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(250, 100), new Dimension(250, 100), new Dimension(250, 100), 0, false));
         pnlStoreKeeper.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_KeeperFunctions")));
         btnForcePickUp = new JButton();
         Font btnForcePickUpFont = this.$$$getFont$$$(null, -1, 12, btnForcePickUp.getFont());
@@ -986,7 +987,7 @@ public class ClientGUI extends JFrame {
         pnlStoreKeeper.add(historyButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(200, 30), new Dimension(200, 30), new Dimension(200, 30), 0, false));
         pnlManager = new JPanel();
         pnlManager.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        pnlRight.add(pnlManager, new GridConstraints(8, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(270, -1), new Dimension(270, -1), new Dimension(270, -1), 0, false));
+        pnlRight.add(pnlManager, new GridConstraints(8, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(270, 100), new Dimension(270, 100), new Dimension(270, 100), 0, false));
         pnlManager.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4473925)), ResourceBundle.getBundle("strings").getString("btn_ManagerMenu")));
         btnRunManagerCommand = new JButton();
         Font btnRunManagerCommandFont = this.$$$getFont$$$(null, -1, 14, btnRunManagerCommand.getFont());
@@ -1009,7 +1010,7 @@ public class ClientGUI extends JFrame {
         btnLoad.setMargin(new Insets(0, 0, 0, 0));
         btnLoad.setName(ResourceBundle.getBundle("properties/labelNames").getString("btnLoad"));
         this.$$$loadButtonText$$$(btnLoad, ResourceBundle.getBundle("strings").getString("btn_Load"));
-        pnlRight.add(btnLoad, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(120, 60), new Dimension(120, 60), new Dimension(120, 60), 0, false));
+        pnlRight.add(btnLoad, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(120, 60), new Dimension(120, 60), new Dimension(120, 60), 1, false));
         btnPickUp = new JButton();
         Font btnPickUpFont = this.$$$getFont$$$(null, -1, 14, btnPickUp.getFont());
         if (btnPickUpFont != null) btnPickUp.setFont(btnPickUpFont);
@@ -1025,11 +1026,9 @@ public class ClientGUI extends JFrame {
         pnlRight.add(rbSelectDate, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(100, 25), new Dimension(100, 25), new Dimension(100, 25), 0, false));
         lblCurrentUser = new JLabel();
         lblCurrentUser.setText("");
-        pnlRight.add(lblCurrentUser, new GridConstraints(11, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(200, -1), new Dimension(200, -1), new Dimension(200, -1), 0, false));
+        pnlRight.add(lblCurrentUser, new GridConstraints(10, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(200, 40), new Dimension(200, 40), new Dimension(200, 40), 0, false));
         final Spacer spacer2 = new Spacer();
         pnlRight.add(spacer2, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(-1, 30), new Dimension(-1, 30), new Dimension(-1, 30), 0, false));
-        final Spacer spacer3 = new Spacer();
-        pnlRight.add(spacer3, new GridConstraints(9, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**

@@ -9,18 +9,18 @@
       <alignmentX value="0.0"/>
       <alignmentY value="0.0"/>
       <autoscrolls value="false"/>
-      <maximumSize width="1280" height="780"/>
-      <minimumSize width="1280" height="780"/>
-      <preferredSize width="1280" height="780"/>
+      <maximumSize width="1280" height="720"/>
+      <minimumSize width="1280" height="720"/>
+      <preferredSize width="1280" height="720"/>
     </properties>
     <border type="none"/>
     <children>
       <scrollpane id="75f9a" binding="scrTable">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <minimum-size width="980" height="780"/>
-            <preferred-size width="980" height="780"/>
-            <maximum-size width="980" height="780"/>
+            <minimum-size width="980" height="710"/>
+            <preferred-size width="980" height="710"/>
+            <maximum-size width="980" height="710"/>
           </grid>
         </constraints>
         <properties>
@@ -32,22 +32,22 @@
           <component id="31e47" class="javax.swing.JTable" binding="mainTable">
             <constraints/>
             <properties>
-              <maximumSize width="950" height="780"/>
-              <minimumSize width="950" height="780"/>
+              <maximumSize width="950" height="700"/>
+              <minimumSize width="950" height="700"/>
               <name resource-bundle="properties/labelNames" key="mainTable"/>
-              <preferredScrollableViewportSize width="950" height="780"/>
-              <preferredSize width="950" height="780"/>
+              <preferredScrollableViewportSize width="950" height="700"/>
+              <preferredSize width="950" height="700"/>
             </properties>
           </component>
         </children>
       </scrollpane>
-      <grid id="44b9e" binding="pnlRight" layout-manager="GridLayoutManager" row-count="12" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="44b9e" binding="pnlRight" layout-manager="GridLayoutManager" row-count="11" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <minimum-size width="300" height="-1"/>
-            <preferred-size width="300" height="-1"/>
-            <maximum-size width="300" height="-1"/>
+            <minimum-size width="300" height="720"/>
+            <preferred-size width="300" height="720"/>
+            <maximum-size width="300" height="720"/>
           </grid>
         </constraints>
         <properties>
@@ -59,9 +59,9 @@
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <minimum-size width="280" height="-1"/>
-                <preferred-size width="280" height="-1"/>
-                <maximum-size width="280" height="-1"/>
+                <minimum-size width="280" height="50"/>
+                <preferred-size width="280" height="50"/>
+                <maximum-size width="280" height="50"/>
               </grid>
             </constraints>
             <properties>
@@ -114,10 +114,10 @@
           </component>
           <scrollpane id="e8c8d" binding="scrDataPane">
             <constraints>
-              <grid row="10" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="1" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                <minimum-size width="250" height="-1"/>
-                <preferred-size width="250" height="-1"/>
-                <maximum-size width="250" height="-1"/>
+              <grid row="9" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="1" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                <minimum-size width="250" height="80"/>
+                <preferred-size width="250" height="80"/>
+                <maximum-size width="250" height="80"/>
               </grid>
             </constraints>
             <properties>
@@ -132,10 +132,10 @@
                 <properties>
                   <editable value="false"/>
                   <font size="26" style="1"/>
-                  <maximumSize width="250" height="120"/>
-                  <minimumSize width="250" height="120"/>
+                  <maximumSize width="250" height="80"/>
+                  <minimumSize width="250" height="80"/>
                   <name resource-bundle="properties/labelNames" key="txtCellInfo"/>
-                  <preferredSize width="250" height="120"/>
+                  <preferredSize width="250" height="80"/>
                   <wrapStyleWord value="true"/>
                 </properties>
               </component>
@@ -145,9 +145,9 @@
             <margin top="0" left="5" bottom="0" right="5"/>
             <constraints>
               <grid row="6" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                <minimum-size width="200" height="-1"/>
-                <preferred-size width="200" height="-1"/>
-                <maximum-size width="200" height="-1"/>
+                <minimum-size width="200" height="90"/>
+                <preferred-size width="200" height="90"/>
+                <maximum-size width="200" height="90"/>
               </grid>
             </constraints>
             <properties/>
@@ -186,9 +186,9 @@
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <grid row="7" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <minimum-size width="250" height="-1"/>
-                <preferred-size width="250" height="-1"/>
-                <maximum-size width="250" height="-1"/>
+                <minimum-size width="250" height="100"/>
+                <preferred-size width="250" height="100"/>
+                <maximum-size width="250" height="100"/>
               </grid>
             </constraints>
             <properties/>
@@ -228,9 +228,9 @@
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <grid row="8" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <minimum-size width="270" height="-1"/>
-                <preferred-size width="270" height="-1"/>
-                <maximum-size width="270" height="-1"/>
+                <minimum-size width="270" height="100"/>
+                <preferred-size width="270" height="100"/>
+                <maximum-size width="270" height="100"/>
               </grid>
             </constraints>
             <properties/>
@@ -280,7 +280,7 @@
           </component>
           <component id="acdc0" class="javax.swing.JButton" binding="btnLoad">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="3" anchor="0" fill="3" indent="1" use-parent-layout="false">
                 <minimum-size width="120" height="60"/>
                 <preferred-size width="120" height="60"/>
                 <maximum-size width="120" height="60"/>
@@ -325,10 +325,10 @@
           </component>
           <component id="8d8e3" class="javax.swing.JLabel" binding="lblCurrentUser">
             <constraints>
-              <grid row="11" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <minimum-size width="200" height="-1"/>
-                <preferred-size width="200" height="-1"/>
-                <maximum-size width="200" height="-1"/>
+              <grid row="10" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <minimum-size width="200" height="40"/>
+                <preferred-size width="200" height="40"/>
+                <maximum-size width="200" height="40"/>
               </grid>
             </constraints>
             <properties>
@@ -342,11 +342,6 @@
                 <preferred-size width="-1" height="30"/>
                 <maximum-size width="-1" height="30"/>
               </grid>
-            </constraints>
-          </vspacer>
-          <vspacer id="b5955">
-            <constraints>
-              <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
           </vspacer>
         </children>

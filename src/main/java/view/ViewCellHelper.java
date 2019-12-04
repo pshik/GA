@@ -1,12 +1,11 @@
 package view;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 
 class ViewCellHelper {
     private static final int TEXT_SIZE = 9;
-    private static final int HEIGHT = 32;
+    private static final int HEIGHT = 29;
     private static int WIDTH_1;
     private static int WIDTH_2;
     private static int WIDTH_3;
@@ -21,6 +20,19 @@ class ViewCellHelper {
     private final static Color BLOCKED_COLOR = new Color(0,0,0);
     private static Icon iconPallet = null;
     private static Icon iconEmpty = null;
+   // private int prevNum = 0;
+    private Color prevFillColorB1 =null;
+    private Color prevTextColorB1 =null;
+    private Color prevFillColorB2 =null;
+    private Color prevTextColorB2 =null;
+    private Color prevFillColorB3 =null;
+    private Color prevTextColorB3 =null;
+    private Color prevFillColorB4 =null;
+    private Color prevTextColorB4 =null;
+    private Color prevFillColorB5 =null;
+    private Color prevTextColorB5 =null;
+    private Color prevFillColorB6 =null;
+    private Color prevTextColorB6 =null;
     private  JButton button1;
     private  JButton button2;
     private  JButton button3;
@@ -113,11 +125,6 @@ class ViewCellHelper {
         button4.setFont(new Font("Arial",Font.PLAIN,TEXT_SIZE));
         button5.setFont(new Font("Arial",Font.PLAIN,TEXT_SIZE));
         button6.setFont(new Font("Arial",Font.PLAIN,TEXT_SIZE));
-//        button2.setHorizontalAlignment(SwingConstants.LEFT);
-//        button3.setHorizontalAlignment(SwingConstants.LEFT);
-//        button4.setHorizontalAlignment(SwingConstants.LEFT);
-//        button5.setHorizontalAlignment(SwingConstants.LEFT);
-//        button6.setHorizontalAlignment(SwingConstants.LEFT);
         button1.setBorder(BorderFactory.createEtchedBorder(1));
         button2.setBorder(BorderFactory.createEtchedBorder(1));
         button3.setBorder(BorderFactory.createEtchedBorder(1));
@@ -191,6 +198,7 @@ class ViewCellHelper {
         button5.setBackground(DEFAULT_COLOR);
         button6.setBackground(DEFAULT_COLOR);
         button1.setIcon(iconEmpty);
+        button2.setIcon(iconEmpty);
         button3.setIcon(iconEmpty);
         button4.setIcon(iconEmpty);
         button5.setIcon(iconEmpty);
@@ -204,5 +212,75 @@ class ViewCellHelper {
         button4.setText("");
         button5.setText("");
         button6.setText("");
+    }
+
+    public void selectCell(int i) {
+      //  prevNum = i;
+        switch (i){
+            case 0:
+                prevFillColorB1 = button1.getBackground();
+                prevTextColorB1 = button1.getForeground();
+                removeSelection();
+                button1.setBackground(Color.cyan);
+                button1.setForeground(Color.cyan);
+                break;
+            case 1:
+                prevFillColorB2 = button2.getBackground();
+                prevTextColorB2 = button2.getForeground();
+                removeSelection();
+                button2.setBackground(Color.cyan);
+                button2.setForeground(Color.cyan);
+                break;
+            case 2:
+                prevFillColorB3 = button3.getBackground();
+                prevTextColorB3 = button3.getForeground();
+                removeSelection();
+                button3.setBackground(Color.cyan);
+                button3.setForeground(Color.cyan);
+                break;
+            case 3:
+                prevFillColorB4 = button4.getBackground();
+                prevTextColorB4 = button4.getForeground();
+                removeSelection();
+                button4.setBackground(Color.cyan);
+                button4.setForeground(Color.cyan);
+                break;
+            case 4:
+                prevFillColorB5 = button5.getBackground();
+                prevTextColorB5 = button5.getForeground();
+                removeSelection();
+                button5.setBackground(Color.cyan);
+                button5.setForeground(Color.cyan);
+                break;
+            case 5:
+                prevFillColorB6 = button6.getBackground();
+                prevTextColorB6 = button6.getForeground();
+                removeSelection();
+                button6.setBackground(Color.cyan);
+                button6.setForeground(Color.cyan);
+                break;
+        }
+    }
+
+    public void removeSelection(){
+        if(button1.getBackground() == Color.cyan){
+            button1.setBackground(prevFillColorB1);
+            button1.setForeground(prevTextColorB1);
+        } else if (button2.getBackground() == Color.cyan) {
+            button2.setBackground(prevFillColorB2);
+            button2.setForeground(prevTextColorB2);
+        } else if (button3.getBackground() == Color.cyan) {
+            button3.setBackground(prevFillColorB3);
+            button3.setForeground(prevTextColorB3);
+        } else if (button4.getBackground() == Color.cyan) {
+            button4.setBackground(prevFillColorB4);
+            button4.setForeground(prevTextColorB4);
+        } else if (button5.getBackground() == Color.cyan) {
+            button5.setBackground(prevFillColorB5);
+            button5.setForeground(prevTextColorB5);
+        } else if (button6.getBackground() == Color.cyan) {
+            button6.setBackground(prevFillColorB6);
+            button6.setForeground(prevTextColorB6);
+        }
     }
 }
